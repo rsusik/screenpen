@@ -147,7 +147,6 @@ class MyWidget(QtWidgets.QMainWindow):
             self.buttonBox.accepted.connect(self.ok_success)
             self.buttonBox.rejected.connect(self.reject)
 
-            self.message = QLabel("Something happened, is that OK?")
             self.code    = QPlainTextEdit()
             self.code.setPlainText('''
 def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
@@ -166,7 +165,6 @@ setattr(self, 'drawChart', drawChart)
             ''')
 
             self.layout = QVBoxLayout()
-            self.layout.addWidget(self.message)
             self.layout.addWidget(self.buttonBox)
             self.layout.addWidget(self.code)
             self.setLayout(self.layout)
@@ -192,42 +190,42 @@ setattr(self, 'drawChart', drawChart)
         penToolBar.setStyleSheet("background-color: #eee;")
         self.addToolBar(penToolBar)
         penToolBar.addAction(
-            self.addAction("&ColorGreen",QIcon("green.svg"),self.setColor(Qt.green))
+            self.addAction("&ColorGreen",QIcon("./img/green.svg"),self.setColor(Qt.green))
         )
         penToolBar.addAction(
-            self.addAction("&ColorRed",QIcon("red.svg"),self.setColor(Qt.red))
+            self.addAction("&ColorRed",QIcon("./img/red.svg"),self.setColor(Qt.red))
         )
         penToolBar.addAction(
-            self.addAction("&ColorBlue",QIcon("blue.svg"),self.setColor(Qt.blue))
+            self.addAction("&ColorBlue",QIcon("./img/blue.svg"),self.setColor(Qt.blue))
         )
         penToolBar.addAction(
-            self.addAction("&ColorYellow",QIcon("yellow.svg"),self.setColor(QtGui.QColor(240, 240, 0)))
+            self.addAction("&ColorYellow",QIcon("./img/yellow.svg"),self.setColor(QtGui.QColor(240, 240, 0)))
         )
         penToolBar.addAction(
-            self.addAction("&ColorViolet",QIcon("violet.svg"),self.setColor(QtGui.QColor(118, 0, 191)))
+            self.addAction("&ColorViolet",QIcon("./img/violet.svg"),self.setColor(QtGui.QColor(118, 0, 191)))
         )
 
         penToolBar.addAction(
-            self.addAction("&WidthThin",QIcon("thin.svg"),self.setWidth(width=3))
+            self.addAction("&WidthThin",QIcon("./img/thin.svg"),self.setWidth(width=3))
         )
         penToolBar.addAction(
-            self.addAction("&WidthMedium",QIcon("medium.svg"),self.setWidth(width=9))
+            self.addAction("&WidthMedium",QIcon("./img/medium.svg"),self.setWidth(width=9))
         )
         penToolBar.addAction(
-            self.addAction("&WidthThick",QIcon("thick.svg"),self.setWidth(width=27))
+            self.addAction("&WidthThick",QIcon("./img/thick.svg"),self.setWidth(width=27))
         )
 
         actionBar = QToolBar("Action", self)
         actionBar.setStyleSheet("background-color: #eee;")
         self.addToolBar(actionBar)
         actionBar.addAction(
-            self.addAction("&ShapeLine",QIcon("line.svg"),self.setAction('drawPath'))
+            self.addAction("&ShapeLine",QIcon("./img/line.svg"),self.setAction('drawPath'))
         )
         actionBar.addAction(
-            self.addAction("&ShapeRect",QIcon("rect.svg"),self.setAction('drawRect'))
+            self.addAction("&ShapeRect",QIcon("./img/rect.svg"),self.setAction('drawRect'))
         )
         actionBar.addAction(
-            self.addAction("&Chart",QIcon("chart.png"),self.showChart())
+            self.addAction("&Chart",QIcon("./img/chart.png"),self.showChart())
         )
 
         
