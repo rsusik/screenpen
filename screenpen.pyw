@@ -10,7 +10,7 @@ import sys
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QToolBar, QAction, QDialog
 from PyQt5.QtGui import QIcon, QScreen
@@ -38,12 +38,10 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
-import win32api
-import win32con
-import win32gui
+
 # https://stackoverflow.com/questions/58157159/making-a-fullscreen-paint-program-with-transparent-background-of-my-application
 class MyWidget(QtWidgets.QMainWindow):
-    def __init__(self, pixmap: QtGui.QPixmap = None): # app: QApplication
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
         #self.setGeometry(30,30,600,400)
         #self.setGeometry(300, 300, 280, 270)
@@ -53,20 +51,25 @@ class MyWidget(QtWidgets.QMainWindow):
         #self.show()
         
         print(pixmap.size())
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        
 
-        avGeom = QtWidgets.QDesktopWidget().screenGeometry()
-        print(avGeom)
+        #avGeom = QtWidgets.QDesktopWidget().screenGeometry()
+        #print(avGeom)
         print(self.size())
         #avGeom.setY(avGeom.y() - 30)
         #avGeom.setY(avGeom.y())
-        self.setGeometry(avGeom)
+        self.move(screen_geom.topLeft())
+        self.setGeometry(screen_geom)
         #self.setGeometry(30, 30, 400, 400)
         #self.setGeometry(30, 30, 400, 400)
+        #self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.activateWindow()
         #self.raise()
         #self.showMaximized()
-        self.show()
+        self.showFullScreen()
+        
+        #self.show()
+        
         
 
         self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
@@ -357,19 +360,34 @@ setattr(self, 'drawChart', drawChart)
 
 if __name__ == '__main__':
 
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
+    parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
+    parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
+    args = parser.parse_args()
+    args.screen = args.screen if args.screen is not None else 0
+    print(args)
+
     app = QApplication(sys.argv)
     #date = datetime.now()
     #filename = date.strftime('%Y-%m-%d_%H-%M-%S.jpg')
     #QScreen.grabWindow(app.primaryScreen(), QApplication.desktop().winId(), self.pos().x(), self.pos().y(), self.width(), self.height()).save(filename, 'png')
     
+    screen = app.screens()[args.screen]
+    screen_geom = QDesktopWidget().screenGeometry(args.screen)
+
+
     pixmap = QScreen.grabWindow(
-        app.primaryScreen(), 
+        screen, 
         QApplication.desktop().winId(), 
-        0, 
-        0, 
-        app.primaryScreen().size().width(), 
-        app.primaryScreen().size().height()
+        screen_geom.x(), 
+        screen_geom.y(), 
+        screen.size().width(), 
+        screen.size().height()
     )#.save('screen.png', 'png')
         
-    window = MyWidget(pixmap)
+    window = MyWidget(screen, screen_geom, pixmap)
+    window.move(screen_geom.left(), screen_geom.top())
     sys.exit(app.exec_())
