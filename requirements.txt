@@ -1,0 +1,4 @@
+pyqt==5
+qt==5
+numpy==1.18
+matplotlib==3.2
