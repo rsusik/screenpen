@@ -13,7 +13,7 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QToolBar, QAction, QDialog
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QScreen
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -38,28 +38,47 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
-
-
+import win32api
+import win32con
+import win32gui
+# https://stackoverflow.com/questions/58157159/making-a-fullscreen-paint-program-with-transparent-background-of-my-application
 class MyWidget(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
         #self.setGeometry(30,30,600,400)
         #self.setGeometry(300, 300, 280, 270)
-        self.setStyleSheet("background:transparent")
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.showMaximized()
+        #self.setStyleSheet("background:transparent")
+        #self.setAttribute(Qt.WA_TranslucentBackground)
+        #self.showMaximized()
+        #self.show()
+        
+        print(pixmap.size())
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
         avGeom = QtWidgets.QDesktopWidget().screenGeometry()
         print(avGeom)
         print(self.size())
-        avGeom.setY(avGeom.y() - 30)
+        #avGeom.setY(avGeom.y() - 30)
+        #avGeom.setY(avGeom.y())
         self.setGeometry(avGeom)
+        #self.setGeometry(30, 30, 400, 400)
+        #self.setGeometry(30, 30, 400, 400)
+        self.activateWindow()
+        #self.raise()
+        #self.showMaximized()
+        self.show()
+        
 
         self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw.fill(QtCore.Qt.transparent)
-
+        #self.imageDraw.fill(QtCore.Qt.transparent)
+        qp = QtGui.QPainter(self.imageDraw)
+        qp.drawPixmap(self.imageDraw.rect(), pixmap, pixmap.rect())
+        qp.end()
+        
         self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw_bck.fill(QtCore.Qt.transparent)
+        qp2 = QtGui.QPainter(self.imageDraw_bck)
+        qp2.drawPixmap(self.imageDraw_bck.rect(), pixmap, pixmap.rect())
+        qp2.end()
 
         self.begin = QtCore.QPoint()
         self.end = QtCore.QPoint()
@@ -79,6 +98,29 @@ class MyWidget(QtWidgets.QMainWindow):
 
 
         self._createToolBars()
+
+        from datetime import datetime
+        #self.setAttribute(Qt.WA_TranslucentBackground, True)
+
+        fuchsia = (0, 0, 0)  # Transparency color
+        hwnd = self.winId()
+        print(f'pos: {self.pos()}')
+        print(f'width: {self.width()}, height: {self.height()}')
+        
+
+        #win32gui.SetWindowLong (hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong (hwnd, win32con.GWL_EXSTYLE ) | win32con.WS_EX_LAYERED ) #  win32con.WS_EX_TRANSPARENT | win32con.WS_EX_LAYERED |
+        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 90, win32con.LWA_COLORKEY) 
+        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 90, win32con.LWA_ALPHA)
+        #win32gui.SetWindowLong (hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong (hwnd, win32con.GWL_EXSTYLE ) | win32con.WS_TILEDWINDOW )
+        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 0, win32con.LWA_ALPHA)
+
+        #self.setAttribute(Qt.WA_NoSystemBackground, True)
+        #self.setAttribute(Qt.WA_TranslucentBackground, True)
+        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setStyleSheet("background:transparent")
+        #self.setAttribute(Qt.WA_NoMousePropagation, True)
+        #self.setAttribute(Qt.WA_AcceptTouchEvents, True)
+        #self.setAttribute(Qt.WA_InputMethodEnabled, True)
         
     def drawChart(self, qp:QtGui.QPainter, p1:QtCore.QPoint):
         fig = Figure((6, 4))
@@ -316,5 +358,18 @@ setattr(self, 'drawChart', drawChart)
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    window = MyWidget()
+    #date = datetime.now()
+    #filename = date.strftime('%Y-%m-%d_%H-%M-%S.jpg')
+    #QScreen.grabWindow(app.primaryScreen(), QApplication.desktop().winId(), self.pos().x(), self.pos().y(), self.width(), self.height()).save(filename, 'png')
+    
+    pixmap = QScreen.grabWindow(
+        app.primaryScreen(), 
+        QApplication.desktop().winId(), 
+        0, 
+        0, 
+        app.primaryScreen().size().width(), 
+        app.primaryScreen().size().height()
+    )#.save('screen.png', 'png')
+        
+    window = MyWidget(pixmap)
     sys.exit(app.exec_())
