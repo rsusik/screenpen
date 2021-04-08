@@ -28,6 +28,8 @@ from PyQt5.QtWidgets import (
 )
 
 import numpy as np
+import platform
+from datetime import datetime
 
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 if QtCore.qVersion() >= "5.":
@@ -43,51 +45,36 @@ from matplotlib.figure import Figure
 class MyWidget(QtWidgets.QMainWindow):
     def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
-        #self.setGeometry(30,30,600,400)
-        #self.setGeometry(300, 300, 280, 270)
-        #self.setStyleSheet("background:transparent")
-        #self.setAttribute(Qt.WA_TranslucentBackground)
-        #self.showMaximized()
-        #self.show()
-        
-        print(pixmap.size())
         
 
-        #avGeom = QtWidgets.QDesktopWidget().screenGeometry()
-        #print(avGeom)
-        print(self.size())
-        #avGeom.setY(avGeom.y() - 30)
-        #avGeom.setY(avGeom.y())
-        self.move(screen_geom.topLeft())
-        self.setGeometry(screen_geom)
-        #self.setGeometry(30, 30, 400, 400)
-        #self.setGeometry(30, 30, 400, 400)
-        #self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.activateWindow()
-        #self.raise()
-        #self.showMaximized()
-        self.showFullScreen()
-        
-        #self.show()
-        
-        
+        if platform.system() == 'Linux':
+            self.setAttribute(Qt.WA_TranslucentBackground)
+            self.move(screen_geom.topLeft())
+            self.setGeometry(screen_geom)
+            self.activateWindow()
+            self.showFullScreen()
+            self._createCanvas()
+            self.imageDraw.fill(QtCore.Qt.transparent)
+        else:
+            self.move(screen_geom.topLeft())
+            self.setGeometry(screen_geom)
+            self.activateWindow()
+            self.showFullScreen()
+            self._createCanvas()
 
-        self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        #self.imageDraw.fill(QtCore.Qt.transparent)
-        qp = QtGui.QPainter(self.imageDraw)
-        qp.drawPixmap(self.imageDraw.rect(), pixmap, pixmap.rect())
-        qp.end()
+            qp = QtGui.QPainter(self.imageDraw)
+            qp.drawPixmap(self.imageDraw.rect(), pixmap, pixmap.rect())
+            qp.end()
+
+            qp2 = QtGui.QPainter(self.imageDraw_bck)
+            qp2.drawPixmap(self.imageDraw_bck.rect(), pixmap, pixmap.rect())
+            qp2.end()
         
-        self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        qp2 = QtGui.QPainter(self.imageDraw_bck)
-        qp2.drawPixmap(self.imageDraw_bck.rect(), pixmap, pixmap.rect())
-        qp2.end()
 
         self.begin = QtCore.QPoint()
         self.end = QtCore.QPoint()
         self.lastPoint = QtCore.QPoint()
 
-        
         self.drawing = False
         self.curr_method = 'drawPath'
         self.curr_color = Qt.red #QtGui.QColor(100, 10, 10, 0)
@@ -99,32 +86,14 @@ class MyWidget(QtWidgets.QMainWindow):
         self.curr_pen = QtGui.QPen() # self.color, 3, Qt.SolidLine
         self._setupTools()
 
-
         self._createToolBars()
 
-        from datetime import datetime
-        #self.setAttribute(Qt.WA_TranslucentBackground, True)
-
-        fuchsia = (0, 0, 0)  # Transparency color
-        hwnd = self.winId()
-        print(f'pos: {self.pos()}')
-        print(f'width: {self.width()}, height: {self.height()}')
+        #self.setStyleSheet("background:transparent")
         
+    def _createCanvas(self):
+        self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
 
-        #win32gui.SetWindowLong (hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong (hwnd, win32con.GWL_EXSTYLE ) | win32con.WS_EX_LAYERED ) #  win32con.WS_EX_TRANSPARENT | win32con.WS_EX_LAYERED |
-        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 90, win32con.LWA_COLORKEY) 
-        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 90, win32con.LWA_ALPHA)
-        #win32gui.SetWindowLong (hwnd, win32con.GWL_EXSTYLE, win32gui.GetWindowLong (hwnd, win32con.GWL_EXSTYLE ) | win32con.WS_TILEDWINDOW )
-        #win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(*fuchsia), 0, win32con.LWA_ALPHA)
-
-        #self.setAttribute(Qt.WA_NoSystemBackground, True)
-        #self.setAttribute(Qt.WA_TranslucentBackground, True)
-        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
-        self.setStyleSheet("background:transparent")
-        #self.setAttribute(Qt.WA_NoMousePropagation, True)
-        #self.setAttribute(Qt.WA_AcceptTouchEvents, True)
-        #self.setAttribute(Qt.WA_InputMethodEnabled, True)
-        
     def drawChart(self, qp:QtGui.QPainter, p1:QtCore.QPoint):
         fig = Figure((6, 4))
         canvas = FigureCanvas(fig)
@@ -198,12 +167,13 @@ def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
     fig = Figure((6, 4))
     canvas = FigureCanvas(fig)
     ax = fig.add_subplot(111)
-    ###### YOU CAN CREATE CUSTOM CHART HERE ######
+    #ax.set_xlim(0, 10)
+    #ax.set_ylim(0, 10)
     x = np.linspace(0, 9, 256)
     y = np.sin(x)
     ax.plot(x, y)
     ax.grid(True)
-    ##############################################
+
     canvas.draw()
     self.drawMatplotlib(qp, canvas, p1)
 setattr(self, 'drawChart', drawChart)
@@ -226,6 +196,11 @@ setattr(self, 'drawChart', drawChart)
 
     def addAction(self, name, icon, fun):
         action = QAction(icon, name, self)
+        #ico = action.icon()
+        #qqp = QtGui.QPainter()
+        #ico.paint(qqp, 0, 0, 10, 10)
+        #qqp.drawLine(0,0,10,10)
+        #qqp.end()
         action.triggered.connect(fun)
         return action
 
@@ -270,6 +245,9 @@ setattr(self, 'drawChart', drawChart)
             self.addAction("&ShapeRect",QIcon("./img/rect.svg"),self.setAction('drawRect'))
         )
         actionBar.addAction(
+            self.addAction("&ShapeLine",QIcon("./img/sline.svg"),self.setAction('drawLine'))
+        )
+        actionBar.addAction(
             self.addAction("&Chart",QIcon("./img/chart.png"),self.showChart())
         )
 
@@ -301,6 +279,14 @@ setattr(self, 'drawChart', drawChart)
                 getattr(qp, self.curr_method)(*self.curr_args)
                 qp.setBrush(self.curr_br)
 
+            elif self.curr_method in ['drawLine']:
+                qp.setBrush(Qt.NoBrush)
+                self.curr_args = [self.begin, self.end]
+                qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
+                
+                getattr(qp, self.curr_method)(*self.curr_args)
+                qp.setBrush(self.curr_br)
+
             elif self.curr_method in ['drawChart']:
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
                 self.drawChart(qp, self.end)
@@ -327,7 +313,7 @@ setattr(self, 'drawChart', drawChart)
             exit()
         if event.button() == Qt.LeftButton:
             self.drawing = True
-        if self.curr_method in ['drawRect', 'drawChart']:
+        if self.curr_method in ['drawRect', 'drawChart', 'drawLine']:
             qp = QtGui.QPainter(self.imageDraw_bck)
             qp.drawImage(self.imageDraw_bck.rect(), self.imageDraw, self.imageDraw.rect())
             qp.end()
@@ -371,10 +357,6 @@ if __name__ == '__main__':
     print(args)
 
     app = QApplication(sys.argv)
-    #date = datetime.now()
-    #filename = date.strftime('%Y-%m-%d_%H-%M-%S.jpg')
-    #QScreen.grabWindow(app.primaryScreen(), QApplication.desktop().winId(), self.pos().x(), self.pos().y(), self.width(), self.height()).save(filename, 'png')
-    
     screen = app.screens()[args.screen]
     screen_geom = QDesktopWidget().screenGeometry(args.screen)
 
@@ -386,8 +368,8 @@ if __name__ == '__main__':
         screen_geom.y(), 
         screen.size().width(), 
         screen.size().height()
-    )#.save('screen.png', 'png')
+    )
         
     window = MyWidget(screen, screen_geom, pixmap)
-    window.move(screen_geom.left(), screen_geom.top())
+    #window.move(screen_geom.left(), screen_geom.top())
     sys.exit(app.exec_())
