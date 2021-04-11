@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
+# Pen In Screen (PenIS)
 # Author:       Robert Susik
 # License:      MIT
 # Email:        robert.susik@gmail.com
@@ -24,6 +25,10 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QPushButton,
     QVBoxLayout,
+    QListWidget,
+    QFormLayout,
+    QHBoxLayout,
+    QGridLayout,
     QLineEdit,
     QPlainTextEdit
 )
@@ -31,6 +36,8 @@ from PyQt5.QtWidgets import (
 import numpy as np
 import platform
 from datetime import datetime
+from xml.dom import minidom
+from utils import syntax
 
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 if QtCore.qVersion() >= "5.":
@@ -42,7 +49,6 @@ else:
 from matplotlib.figure import Figure
 
 
-# https://stackoverflow.com/questions/58157159/making-a-fullscreen-paint-program-with-transparent-background-of-my-application
 class MyWidget(QtWidgets.QMainWindow):
     def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
@@ -73,140 +79,25 @@ class MyWidget(QtWidgets.QMainWindow):
         self.curr_joinstyle = Qt.RoundJoin
         self.curr_width = 3
         self.curr_br = QtGui.QBrush(self.curr_color)
-        self.curr_pen = QtGui.QPen() # self.color, 3, Qt.SolidLine
+        self.curr_pen = QtGui.QPen()
         self._setupTools()
         self._setupIcons()
         self._createToolBars()
-
-        #self.setStyleSheet("background:transparent")
         
     def _setupIcons(self):
         self._icons = {}
-        self._icons['circle'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-    <ellipse
-        style="fill-opacity:0;stroke-opacity:1;stroke:{STROKE};stroke-width:20;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-        cx="64" cy="64"
-        rx="46" ry="46" 
-    />
-</svg>'''
-        self._icons['dot'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-    <ellipse
-        style="fill-opacity:1;stroke-opacity:1;fill:{STROKE};stroke:{STROKE};stroke-width:20;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-        cx="64" cy="64"
-        rx="46" ry="46" 
-    />
-</svg>'''
-        self._icons['rect'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <rect
-     style="fill:{STROKE};fill-opacity:0;stroke:{STROKE};stroke-width:20"
-     id="rect817"
-     width="100"
-     height="100"
-     x="18"
-     y="10"
-     ry="2.5" />
-</svg>'''
-        self._icons['path'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:20;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 10,116 c 1,-6 2.5,-12 4,-17 21,-66 85,2.8 96,-86" />
-</svg>'''
-        self._icons['line'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 14,112 115,14" />
-</svg>'''
-        self._icons['line_thin'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:8;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 14,112 115,14" />
-</svg>'''
-        self._icons['line_medium'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 14,112 115,14" />
-</svg>'''
-        self._icons['line_thick'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:32;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 14,112 115,14" />
-</svg>'''
-
-        self._icons['line_dashed'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     style="fill:none;stroke:{STROKE};stroke-width:20;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:15,30;stroke-opacity:1;stroke-dashoffset:0"
-     d="M 14,112 115,14" />
-</svg>'''
-
-        self._icons['rect_filled'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <rect
-     style="fill:{FILL};stroke:{STROKE};stroke-width:20;fill-opacity:1"
-     width="105" height="105" x="10" y="10" />
-</svg>'''
-
-        self._icons['line_width'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     d="M 64,13 V 111"
-     style="fill:none;stroke:{STROKE};stroke-width:20;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-  <path
-     d="M 95,38 V 87 L 119,63 Z"
-     style="fill:none;stroke:{STROKE};stroke-width:8;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-  <path
-     d="m 33,38 v 48 L 9,63 Z"
-     style="fill:none;stroke:{STROKE};stroke-width:8;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
-</svg>'''
-
-        self._icons['line_type'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <path
-     d="M 116,80 H 12"
-     style="fill:none;stroke:{STROKE};stroke-width:15;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-  <path
-     d="M 116,50 H 12"
-     style="fill:none;stroke:{STROKE};stroke-width:15;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:15, 30;stroke-dashoffset:0;stroke-opacity:1" />
-</svg>'''
-
-        self._icons['mpl'] = '''
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" stroke="gray">
-<g stroke-width="2" fill="#FFF">
-<circle cx="90" cy="90" r="88"/>
-<circle cx="90" cy="90" r="66"/>
-<circle cx="90" cy="90" r="44"/>
-<circle cx="90" cy="90" r="22"/>
-<path d="m90,2v176m62-26-124-124m124,0-124,124m150-62H2"/>
-</g><g opacity=".8">
-<path fill="#44C" d="m90,90h18a18,18 0 0,0 0-5z"/>
-<path fill="#BC3" d="m90,90 34-43a55,55 0 0,0-15-8z"/>
-<path fill="#D93" d="m90,90-16-72a74,74 0 0,0-31,15z"/>
-<path fill="#DB3" d="m90,90-58-28a65,65 0 0,0-5,39z"/>
-<path fill="#3BB" d="m90,90-33,16a37,37 0 0,0 2,5z"/>
-<path fill="#3C9" d="m90,90-10,45a46,46 0 0,0 18,0z"/>
-<path fill="#D73" d="m90,90 46,58a74,74 0 0,0 12-12z"/>
-</g></svg>'''
-        self._icons['remove'] = '''
-<svg width="128" height="128" viewBox="0 0 128 128">
-  <ellipse
-     style="fill:#e67e7c;fill-opacity:1;stroke:#c00034;stroke-width:10;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     cx="64" cy="64"
-     rx="48" ry="48" />
-  <path
-     style="fill:none;stroke:#f5f5f5;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 46,85 85,46" />
-  <path
-     style="fill:none;stroke:#f5f5f5;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 46,46 85,85" />
-</svg>'''
+        try:
+            DOMTree = minidom.parse('./utils/resources.xml')
+            icons = DOMTree.getElementsByTagName('icon')
+            if len(icons) < 1:
+                raise Exception('ERROR: there are no icons in resources.xml file')
+            for icon in icons:
+                if icon.getAttribute('name')=='':
+                    raise Exception('ERROR: resources.xml: icon doesnt contain "name" attribute')
+                self._icons[icon.getAttribute('name')] = icon.getElementsByTagName('svg')[0].toxml().replace('\n', '')
+        except FileNotFoundError as ex:
+            print('ERROR: There is no resources.xml file')
+            raise ex
 
 
     def _applySvgConfig(self, svg_str, custom_colors_dict=None):
@@ -243,17 +134,6 @@ class MyWidget(QtWidgets.QMainWindow):
             qp2.end()
         self.update()
 
-    def drawChart(self, qp:QtGui.QPainter, p1:QtCore.QPoint):
-        fig = Figure((6, 4))
-        canvas = FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-        x = np.linspace(0, 9, 256)
-        y = np.sin(x)
-        ax.plot(x, y)
-        ax.grid(True)
-        canvas.draw()
-        self.drawMatplotlib(qp, canvas, p1)
-
     def drawMatplotlib(self, qp:QtGui.QPainter, canvas:FigureCanvas, p1:QtCore.QPoint):
         size = canvas.size()
         width, height = size.width(), size.height()
@@ -278,8 +158,13 @@ class MyWidget(QtWidgets.QMainWindow):
             self._setupTools()
         return _setColor
 
+    def setStyle(self, style):
+        def _setStyle():
+            self.curr_style = style
+            self._setupTools()
+        return _setStyle
 
-    def setWidth(self, color=None, width=None):
+    def setWidth(self, width):
         def _setWidth():
             self.curr_width = width
             self._setupTools()
@@ -292,7 +177,17 @@ class MyWidget(QtWidgets.QMainWindow):
 
     class CustomDialog(QDialog):
         def ok_success(self, *args):
-            exec(self.code.toPlainText(), {'self': self.parent, **globals()})
+            sourcecode = '\n'.join(list(map(lambda x: f'    {x}', self.code.toPlainText().replace('\t', '').replace(' ', '').splitlines())))
+            print(sourcecode)
+            self.code = f'''
+def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
+{sourcecode}
+    canvas = FigureCanvas(fig)
+    canvas.draw()
+    self.drawMatplotlib(qp, canvas, p1)
+setattr(self, 'drawChart', drawChart)
+'''
+            exec(self.code, {'self': self.parent, **globals()})
             self.accept()
 
         def __init__(self, parent=None):
@@ -307,31 +202,29 @@ class MyWidget(QtWidgets.QMainWindow):
             self.buttonBox.accepted.connect(self.ok_success)
             self.buttonBox.rejected.connect(self.reject)
             
-            import syntax
             self.resize(800, 600)
             self.code    = QPlainTextEdit()
             highlight = syntax.PythonHighlighter(self.code.document())
             self.code.zoomIn(4)
             self.code.setPlainText('''
-def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
-    fig = Figure((6, 4))
-    canvas = FigureCanvas(fig)
-    ax = fig.add_subplot(111)
-    #ax.set_xlim(0, 10)
-    #ax.set_ylim(0, 10)
-    x = np.linspace(0, 9, 256)
-    y = np.sin(x)
-    ax.plot(x, y)
-    ax.grid(True)
+fig = Figure((6, 4))
+ax = fig.add_subplot(111)
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 10)
+ax.set_xticks(list(range(10)))
+ax.set_yticks(list(range(10)))
+x = np.linspace(0, 9, 256)
+y = np.sin(x) + 2
+ax.plot(x, y)
+ax.grid(True)
+''')
 
-    canvas.draw()
-    self.drawMatplotlib(qp, canvas, p1)
-setattr(self, 'drawChart', drawChart)
-            ''')
-
-            self.layout = QVBoxLayout()
-            self.layout.addWidget(self.buttonBox)
-            self.layout.addWidget(self.code)
+            self.layout = QFormLayout()
+            self.layout.addRow(QListWidget(), self.code)
+            self.layout.addRow(self.buttonBox)
+            #self.layout.addWidget(QListWidget(), 0, 0, 1, 1)
+            #self.layout.addWidget(self.code, 0, 1, 1, 3)
+            #self.layout.addWidget(self.buttonBox, 1, 1, 1, 1)
             self.setLayout(self.layout)
 
     def showChart(self):
@@ -394,11 +287,10 @@ setattr(self, 'drawChart', drawChart)
         actionBar.addAction(self.addAction("Matplotlib chart", self._getIcon('mpl'), self.showChart()))
         
 
-        lineTypeSolidAction = QAction(self._getIcon('line'), 'Solid', self)
-        lineTypeDashedAction = QAction(self._getIcon('line_dashed'), 'Dashed', self)
+
         lineTypeMenu = QMenu()
-        #lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), ))
-        lineTypeMenu.addAction(lineTypeDashedAction)
+        lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), self.setStyle(Qt.SolidLine)))
+        lineTypeMenu.addAction(self.addAction('Dashed', self._getIcon('line_dashed'), self.setStyle(Qt.DashLine)))
         lineTypeButton = QToolButton(self)
         lineTypeButton.setToolButtonStyle(Qt.ToolButtonIconOnly)
         lineTypeButton.setIcon(self._getIcon('line_type'))
@@ -436,7 +328,6 @@ setattr(self, 'drawChart', drawChart)
         qp.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
         canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
 
-
         if Qt.LeftButton and self.drawing:
             qp.setPen(self.curr_pen)
             qp.setBrush(self.curr_br)
@@ -465,7 +356,18 @@ setattr(self, 'drawChart', drawChart)
 
             elif self.curr_method in ['drawChart']:
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
-                self.drawChart(qp, self.end)
+                try:
+                    self.drawChart(qp, self.end)
+                except Exception as ex:
+                    self.drawing = False
+                    msgBox = QtWidgets.QMessageBox()
+                    msgBox.setText(str(ex))
+                    msgBox.exec()
+                    
+                    self.curr_method = 'drawPath'
+                    self.update()
+                    return
+
 
             elif self.curr_method in ['drawPath']:
                 if self.lastPoint != self.end:
@@ -483,6 +385,7 @@ setattr(self, 'drawChart', drawChart)
         
         canvasPainter.drawImage(self.rect(), self.imageDraw, self.imageDraw.rect())
         canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
+        canvasPainter.end()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
@@ -515,8 +418,6 @@ setattr(self, 'drawChart', drawChart)
 
             self.begin = self.scaleCoords(event.pos())
             self.end = self.scaleCoords(event.pos())
-
-
 
             self.update()
 
