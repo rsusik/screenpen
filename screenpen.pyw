@@ -126,11 +126,11 @@ class MyWidget(QtWidgets.QMainWindow):
             self.imageDraw_bck.fill(QtCore.Qt.transparent)
         else:
             qp = QtGui.QPainter(self.imageDraw)
-            qp.drawPixmap(self.imageDraw.rect(), self.screen_geom, self.screen_geom.rect())
+            qp.drawPixmap(self.imageDraw.rect(), self.screen_pixmap, self.screen_pixmap.rect())
             qp.end()
 
             qp2 = QtGui.QPainter(self.imageDraw_bck)
-            qp2.drawPixmap(self.imageDraw_bck.rect(), self.screen_geom, self.screen_geom.rect())
+            qp2.drawPixmap(self.imageDraw_bck.rect(), self.screen_pixmap, self.screen_pixmap.rect())
             qp2.end()
         self.update()
 
