@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
-# Pen In Screen (PenIS)
+# Simple pen
 # Author:       Robert Susik
 # License:      MIT
 # Email:        robert.susik@gmail.com
