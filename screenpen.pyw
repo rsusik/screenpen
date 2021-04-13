@@ -38,6 +38,8 @@ import platform
 from datetime import datetime
 from xml.dom import minidom
 from utils import syntax
+import os
+from types import SimpleNamespace
 
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 if QtCore.qVersion() >= "5.":
@@ -49,10 +51,20 @@ else:
 from matplotlib.figure import Figure
 
 
-class MyWidget(QtWidgets.QMainWindow):
+class ScreenPenWindow(QtWidgets.QMainWindow):
     def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
-        
+
+        # PATHS
+        try:
+            prefix = sys._MEIPASS
+        except Exception:
+            prefix = os.path.abspath(".")
+
+        self.files = SimpleNamespace(
+            resources_xml = os.path.join(prefix, 'utils/resources.xml')
+        )
+                
         self.screen = screen
         self.screen_pixmap = pixmap
         self.screen_geom = screen_geom
@@ -73,7 +85,7 @@ class MyWidget(QtWidgets.QMainWindow):
 
         self.drawing = False
         self.curr_method = 'drawPath'
-        self.curr_color = Qt.red #QtGui.QColor(100, 10, 10, 0)
+        self.curr_color = Qt.red
         self.curr_style = Qt.SolidLine
         self.curr_capstyle = Qt.RoundCap
         self.curr_joinstyle = Qt.RoundJoin
@@ -87,7 +99,7 @@ class MyWidget(QtWidgets.QMainWindow):
     def _setupIcons(self):
         self._icons = {}
         try:
-            DOMTree = minidom.parse('./utils/resources.xml')
+            DOMTree = minidom.parse(self.files.resources_xml)
             icons = DOMTree.getElementsByTagName('icon')
             if len(icons) < 1:
                 raise Exception('ERROR: there are no icons in resources.xml file')
@@ -175,7 +187,7 @@ class MyWidget(QtWidgets.QMainWindow):
             self.curr_method = action
         return _setAction
 
-    class CustomDialog(QDialog):
+    class ChartDialog(QDialog):
         def ok_success(self, *args):
             sourcecode = '\n'.join(list(map(lambda x: f'    {x}', self.code.toPlainText().replace('\t', '').replace(' ', '').splitlines())))
             print(sourcecode)
@@ -193,7 +205,6 @@ setattr(self, 'drawChart', drawChart)
         def __init__(self, parent=None):
             super().__init__(parent=parent)
             self.parent = parent
-            #self.setStyleSheet("background:silver")
             self.setWindowTitle("Chart")
 
             QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -229,7 +240,7 @@ ax.grid(True)
 
     def showChart(self):
         def _showChart():
-            dlg = self.CustomDialog(self)
+            dlg = self.ChartDialog(self)
             if dlg.exec_():
                 self.curr_method = 'drawChart'
             else:
@@ -244,11 +255,6 @@ ax.grid(True)
 
     def addAction(self, name, icon, fun):
         action = QAction(icon, name, self)
-        #ico = action.icon()
-        #qqp = QtGui.QPainter()
-        #ico.paint(qqp, 0, 0, 10, 10)
-        #qqp.drawLine(0,0,10,10)
-        #qqp.end()
         action.triggered.connect(fun)
         return action
 
@@ -256,10 +262,8 @@ ax.grid(True)
     def _createToolBars(self):
         penToolBar = QToolBar("Color", self)
         penToolBar.setIconSize(QSize(50, 50))
-        #penToolBar.setStyleSheet("background-color: #234;")
         actionBar = QToolBar("Action", self)
         actionBar.setIconSize(QSize(50, 50))
-        #actionBar.setStyleSheet("background-color: #eee;")
         self.addToolBar(penToolBar)
         self.addToolBar(Qt.LeftToolBarArea, actionBar)
         
@@ -269,7 +273,6 @@ ax.grid(True)
             'green': Qt.green,
             'blue': Qt.blue,
             'yellow': Qt.yellow,
-            #'violet': QtGui.QColor(118, 0, 191),
             'magenta': Qt.magenta,
             'cyan': Qt.cyan
         }
@@ -279,15 +282,12 @@ ax.grid(True)
                 self.addAction(f'Set {acol} color', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
             )
 
-
         actionBar.addAction(self.addAction("Line", self._getIcon('path'), self.setAction('drawPath')))
         actionBar.addAction(self.addAction("Rect", self._getIcon('rect'), self.setAction('drawRect')))
         actionBar.addAction(self.addAction("Line", self._getIcon('line'), self.setAction('drawLine')))
         actionBar.addAction(self.addAction("Point", self._getIcon('dot'), self.setAction('drawDot')))
         actionBar.addAction(self.addAction("Matplotlib chart", self._getIcon('mpl'), self.showChart()))
         
-
-
         lineTypeMenu = QMenu()
         lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), self.setStyle(Qt.SolidLine)))
         lineTypeMenu.addAction(self.addAction('Dashed', self._getIcon('line_dashed'), self.setStyle(Qt.DashLine)))
@@ -306,7 +306,7 @@ ax.grid(True)
         lineWidthButton = QToolButton(self)
         lineWidthButton.setToolButtonStyle(Qt.ToolButtonIconOnly)
         lineWidthButton.setIcon(self._getIcon('line_width'))
-        lineWidthButton.setPopupMode(QToolButton.InstantPopup) # MenuButtonPopup
+        lineWidthButton.setPopupMode(QToolButton.InstantPopup)
         lineWidthButton.setMenu(lineWidthMenu)
         lineWidthButton.setToolTip('Line width')
         actionBar.addWidget(lineWidthButton)
@@ -389,7 +389,7 @@ ax.grid(True)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
-            exit()
+            sys.exit(0)
         if event.button() == Qt.LeftButton:
             self.drawing = True
         if self.curr_method in ['drawRect', 'drawChart', 'drawLine', 'drawDot']:
@@ -421,24 +421,69 @@ ax.grid(True)
 
             self.update()
 
-if __name__ == '__main__':
+def _grab_screen(screen_idx, screen):
+    screen_geom = QDesktopWidget().screenGeometry(screen_idx)
+    return (
+        screen_geom, 
+        QScreen.grabWindow(
+            screen, 
+            QApplication.desktop().winId(), 
+            screen_geom.x(), 
+            screen_geom.y(), 
+            screen.size().width(), 
+            screen.size().height()
+        )
+    )
+    
 
-    import argparse
+def _get_screens():
+    screens = []
+    for screen_idx, screen in enumerate(app.screens()):
+        screen_geom, screen_pixmap = _grab_screen(screen_idx, screen)
+        screens.append([screen, screen_geom, screen_pixmap])
+    return screens
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
-    parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
-    parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
-    args = parser.parse_args()
-    args.screen = args.screen if args.screen is not None else 0
-    print(args)
+def show_screen_selection(screens):
+    def _getScreenButton(pixmap, label):
+        btn = QPushButton()
+        ico = QIcon(pixmap)
+        btn.setIcon(ico)
+        btn.setIconSize(QSize(160, 160/(pixmap.rect().width()/pixmap.rect().height())))
 
-    app = QApplication(sys.argv)
+        shad = QtWidgets.QGraphicsDropShadowEffect()
+        shad.setOffset(-10, 10)
+        shad.setColor(Qt.black)
+
+        lay = QVBoxLayout(btn)
+        lbl = QtWidgets.QLabel()
+        lbl.setContentsMargins(0, 0, 0, 0)
+        lbl.setStyleSheet("""color : white; font-weight:6000;""")
+        lbl.setText(label)
+        lbl.setGraphicsEffect(shad)
+        lay.addWidget(lbl, alignment=QtCore.Qt.AlignCenter)
+        return btn
 
 
-    app.setStyle("Fusion")
 
-    # Now use a palette to switch to dark colors:
+    dlg = QDialog()
+    dlg.layout = QGridLayout()
+    dlg.layout.addWidget(QLabel('Select the screen') , 0, 0, 1, number_of_screens, alignment=QtCore.Qt.AlignCenter)
+
+    def _getBtnAction(idx):
+        def act():
+            dlg.done(idx)
+        return act
+
+    for idx, scr in enumerate(screens):
+        screen, screen_geom, screen_pixmap = scr
+        label = f'Screen {idx+1}' if idx > 0 else f'Main screen'
+        btn = _getScreenButton(screen_pixmap, label)
+        btn.released.connect(_getBtnAction(idx+1))
+        dlg.layout.addWidget(btn , 1, idx)
+    dlg.setLayout(dlg.layout)
+    return dlg.exec_()
+
+def _setPalette(app):
     palette = QPalette()
     palette.setColor(QPalette.Window, QColor(53, 53, 53))
     palette.setColor(QPalette.WindowText, Qt.white)
@@ -455,22 +500,34 @@ if __name__ == '__main__':
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
     palette.setColor(QPalette.HighlightedText, Qt.black)
     app.setPalette(palette)
+    app.setStyle("Fusion")
 
+if __name__ == '__main__':
 
-    screen = app.screens()[args.screen]
-    screen_geom = QDesktopWidget().screenGeometry(args.screen)
+    import argparse
 
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
+    parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
+    parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
+    args = parser.parse_args()
+    
+    app = QApplication(sys.argv)
+    _setPalette(app)
 
+    number_of_screens = len(app.screens())
 
-    pixmap = QScreen.grabWindow(
-        screen, 
-        QApplication.desktop().winId(), 
-        screen_geom.x(), 
-        screen_geom.y(), 
-        screen.size().width(), 
-        screen.size().height()
-    )
+    screens = _get_screens()
+    
+    if number_of_screens > 1 and args.screen is None:
+        args.screen = show_screen_selection(screens)
+
+    if args.screen == 0:
+        print('No screen chosen, exiting.')
+        sys.exit(0)
+    else:
+        args.screen -= 1
+    screen, screen_geom, pixmap = screens[args.screen]
         
-    window = MyWidget(screen, screen_geom, pixmap)
-    #window.move(screen_geom.left(), screen_geom.top())
+    window = ScreenPenWindow(screen, screen_geom, pixmap)
     sys.exit(app.exec_())
