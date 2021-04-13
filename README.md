@@ -1,5 +1,7 @@
 # Simple pen
 
+## Description
+
 Super simple screen annotation software which allows drawing:
 * line,
 * rectangle,
@@ -16,3 +18,22 @@ Screenshot:
 <img src="screenshot_1.png" height="300px" />
 
 *Note: The app is created ad-hoc only for my use case. It may contain bugs, and the code definitely is not clean.*
+
+## Usage
+
+Tu run the program:
+
+### Pip
+
+```bash
+pip install -r requirements.txt
+python screenpen.pyw
+```
+
+### Conda
+
+Once virtual env is activated:
+```bash
+conda install --file requirements.txt
+python screenpen.pyw
+```
