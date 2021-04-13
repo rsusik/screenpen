@@ -253,6 +253,11 @@ ax.grid(True)
             self._clearCanvas()
         return _removeDrawing
 
+    def saveDrawing(self):
+        def _saveDrawing():
+            self.imageDraw.save('./save.png')
+        return _saveDrawing
+
     def addAction(self, name, icon, fun):
         action = QAction(icon, name, self)
         action.triggered.connect(fun)
@@ -282,12 +287,14 @@ ax.grid(True)
                 self.addAction(f'Set {acol} color', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
             )
 
-        actionBar.addAction(self.addAction("Line", self._getIcon('path'), self.setAction('drawPath')))
+        actionBar.addAction(self.addAction("Path", self._getIcon('path'), self.setAction('drawPath')))
         actionBar.addAction(self.addAction("Rect", self._getIcon('rect'), self.setAction('drawRect')))
         actionBar.addAction(self.addAction("Line", self._getIcon('line'), self.setAction('drawLine')))
         actionBar.addAction(self.addAction("Point", self._getIcon('dot'), self.setAction('drawDot')))
         actionBar.addAction(self.addAction("Matplotlib chart", self._getIcon('mpl'), self.showChart()))
         
+        
+
         lineTypeMenu = QMenu()
         lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), self.setStyle(Qt.SolidLine)))
         lineTypeMenu.addAction(self.addAction('Dashed', self._getIcon('line_dashed'), self.setStyle(Qt.DashLine)))
@@ -311,6 +318,9 @@ ax.grid(True)
         lineWidthButton.setToolTip('Line width')
         actionBar.addWidget(lineWidthButton)
         
+        
+        actionBar.addAction(self.addAction("Save image", self._getIcon('save'), self.saveDrawing())) # self.style().standardIcon(QtWidgets.QStyle.SP_DialogSaveButton)
+
         actionBar.addAction(self.addAction("Remove drawings", self._getIcon('remove'), self.removeDrawing()))
         
 
@@ -339,12 +349,10 @@ ax.grid(True)
                 getattr(qp, self.curr_method)(*self.curr_args)
                 qp.setBrush(self.curr_br)
             elif self.curr_method in ['drawDot']:
-                #qp.setBrush(Qt.NoBrush)
                 self.curr_args = [self.end, 10, 10]
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
                 
                 getattr(qp, 'drawEllipse')(*self.curr_args)
-                #qp.setBrush(self.curr_br)
 
             elif self.curr_method in ['drawLine']:
                 qp.setBrush(Qt.NoBrush)
@@ -521,12 +529,12 @@ if __name__ == '__main__':
     
     if number_of_screens > 1 and args.screen is None:
         args.screen = show_screen_selection(screens)
+        if args.screen == 0 or args.screen is None:
+            print('No screen chosen, exiting.')
+            sys.exit(0)
+        else:
+            args.screen -= 1
 
-    if args.screen == 0:
-        print('No screen chosen, exiting.')
-        sys.exit(0)
-    else:
-        args.screen -= 1
     screen, screen_geom, pixmap = screens[args.screen]
         
     window = ScreenPenWindow(screen, screen_geom, pixmap)

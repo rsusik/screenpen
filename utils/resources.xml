@@ -136,5 +136,39 @@
      d="M 46,46 85,85" />
 </svg>
 </icon>
+<icon name="save">
+<svg width="128" height="128" viewBox="0 0 128 128">
+  <rect
+     ry="2.4345105"
+     y="11.407743"
+     x="10.002536"
+     height="105.09033"
+     width="109.43916"
+     id="rect817"
+     style="fill:#f0f0f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none" />
+  <rect
+     y="72.582008"
+     x="30.489487"
+     height="43.912529"
+     width="68.841042"
+     id="rect812"
+     style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:8;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
+  <rect
+     ry="0"
+     y="83.170021"
+     x="44.529148"
+     height="23.311754"
+     width="10.847506"
+     id="rect814"
+     style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:6;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
+  <rect
+     y="10.914328"
+     x="26.534506"
+     height="35.632309"
+     width="77.534225"
+     id="rect816"
+     style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
+</svg>
+</icon>
 </icons>
 </resources>
