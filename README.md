@@ -2,18 +2,24 @@
 
 ## Description
 
-Super simple screen annotation software which allows drawing:
+Super simple screen annotation software which allows drawing directly on the screen:
 * line,
 * rectangle,
-* charts (using matplotlib).
-
-Right mouse click stops the program.
-
+* chart (using matplotlib).
 The application allows writing directly on the screen.
-* For Linux transparent background is used.
-* For Windows, the screenshot is taken, and the user draws on the captured image.
 
-Screenshot:
+The behavior of he programs depends on the OS you use:
+* For Linux transparent background is used (you can see a video playing in the background).
+* For Windows, the screenshot is taken, and the user draws on the captured image (you see a static image of the screen).
+
+### Controls
+* Left mouse button - drawing.
+* Right mouse button - quit.
+* Keyboard shortcuts:
+    * `Ctrl+Z` - undo
+    * `Ctrl+Y` - redo
+
+### Screenshot
 
 <img src="screenshot_1.png" height="300px" />
 

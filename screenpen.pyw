@@ -14,23 +14,18 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu
-from PyQt5.QtGui import QIcon, QScreen, QPalette, QColor, QSyntaxHighlighter
+from PyQt5.QtGui import (
+    QIcon, QScreen, QPalette, QColor, 
+    QSyntaxHighlighter, QPixmap, QKeySequence
+)
 
 
 from PyQt5.QtWidgets import (
-    QApplication,
-    QDialog,
-    QDialogButtonBox,
-    QLabel,
-    QMainWindow,
-    QPushButton,
-    QVBoxLayout,
-    QListWidget,
-    QFormLayout,
-    QHBoxLayout,
-    QGridLayout,
-    QLineEdit,
-    QPlainTextEdit
+    QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
+    QPushButton, QVBoxLayout, QListWidget, QFormLayout,
+    QHBoxLayout, QGridLayout,
+    QLineEdit, QPlainTextEdit,
+    QShortcut
 )
 
 import numpy as np
@@ -50,6 +45,8 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
+
+        
 
 class ScreenPenWindow(QtWidgets.QMainWindow):
     def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
@@ -78,6 +75,8 @@ class ScreenPenWindow(QtWidgets.QMainWindow):
         self._createCanvas()
         self._clearCanvas()
         
+        self.history = self.drawingHistory(10)
+        self.history.append(self.screen_pixmap)
 
         self.begin = QtCore.QPoint()
         self.end = QtCore.QPoint()
@@ -96,6 +95,11 @@ class ScreenPenWindow(QtWidgets.QMainWindow):
         self._setupIcons()
         self._createToolBars()
         
+        self.sc_undo = QShortcut(QKeySequence('Ctrl+Z'), self)
+        self.sc_undo.activated.connect(self.undo)
+        self.sc_redo = QShortcut(QKeySequence('Ctrl+Y'), self)
+        self.sc_redo.activated.connect(self.redo)
+
     def _setupIcons(self):
         self._icons = {}
         try:
@@ -395,11 +399,17 @@ ax.grid(True)
         canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
         canvasPainter.end()
 
+
+
+
+
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             sys.exit(0)
         if event.button() == Qt.LeftButton:
             self.drawing = True
+        # if event.button() == Qt.MiddleButton:
+        #     self.revert()
         if self.curr_method in ['drawRect', 'drawChart', 'drawLine', 'drawDot']:
             qp = QtGui.QPainter(self.imageDraw_bck)
             qp.drawImage(self.imageDraw_bck.rect(), self.imageDraw, self.imageDraw.rect())
@@ -419,6 +429,57 @@ ax.grid(True)
         self.end = self.scaleCoords(event.pos())
         self.update()
 
+
+    class drawingHistory(list):
+        def __init__(self, limit=4):
+            self.limit = limit
+            self.current = -1
+        
+        def append(self, el):
+            if self.current < len(self):
+                del self[self.current + 1:]
+                
+            if len(self) >= self.limit:
+                del self[0]
+                self.current = self.limit - 2
+            super().append(el)
+            self.current += 1
+            
+        def extend(self, l):
+            for el in l:
+                self.append(el)
+            
+        def undo(self):
+            if self.current > 0:
+                self.current -= 1
+            return self[self.current]
+        
+        def redo(self):
+            if self.current + 1 < len(self):
+                self.current += 1
+            return self[self.current]
+            
+    def drawPixmap(self, p):
+        qp = QtGui.QPainter(self.imageDraw)
+        qp.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
+        qp.drawPixmap(self.imageDraw.rect(), p, p.rect())
+        qp.end()
+
+        qp2 = QtGui.QPainter(self.imageDraw_bck)
+        qp2.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
+        qp2.drawPixmap(self.imageDraw_bck.rect(), p, p.rect())
+        qp2.end()
+
+    def undo(self):
+        p = self.history.undo()
+        self.drawPixmap(p)
+        self.update()
+
+    def redo(self):
+        p = self.history.redo()
+        self.drawPixmap(p)
+        self.update()
+
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.drawing = False
@@ -428,6 +489,10 @@ ax.grid(True)
             self.end = self.scaleCoords(event.pos())
 
             self.update()
+            p = QPixmap()
+            p.convertFromImage(self.imageDraw)
+            self.history.append(p)
+            print(self.history)
 
 def _grab_screen(screen_idx, screen):
     screen_geom = QDesktopWidget().screenGeometry(screen_idx)
