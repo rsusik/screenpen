@@ -8,6 +8,8 @@
 # ----------------------------------------------------------------------------
 
 import sys
+from datetime import datetime
+from matplotlib.backends.backend_qt5 import ToolbarQt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
@@ -48,7 +50,7 @@ from matplotlib.figure import Figure
 
         
 
-class ScreenPenWindow(QtWidgets.QMainWindow):
+class ScreenPenWindow(QMainWindow):
     def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
         super().__init__()
 
@@ -94,6 +96,8 @@ class ScreenPenWindow(QtWidgets.QMainWindow):
         self._setupTools()
         self._setupIcons()
         self._createToolBars()
+
+
         
         self.sc_undo = QShortcut(QKeySequence('Ctrl+Z'), self)
         self.sc_undo.activated.connect(self.undo)
@@ -194,7 +198,6 @@ class ScreenPenWindow(QtWidgets.QMainWindow):
     class ChartDialog(QDialog):
         def ok_success(self, *args):
             sourcecode = '\n'.join(list(map(lambda x: f'    {x}', self.code.toPlainText().replace('\t', '').replace(' ', '').splitlines())))
-            print(sourcecode)
             self.code = f'''
 def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
 {sourcecode}
@@ -257,9 +260,22 @@ ax.grid(True)
             self._clearCanvas()
         return _removeDrawing
 
+    def captureScreen(self):
+        for tb in self.toolBars:
+            tb.hide()
+        img = self.imageDraw.copy()
+        qp = QtGui.QPainter(img)
+        qp.drawPixmap(img.rect(), self.screen_pixmap, self.screen_pixmap.rect())
+        qp.drawImage(img.rect(), self.imageDraw, self.imageDraw.rect())
+        qp.end()
+        for tb in self.toolBars:
+            tb.show()
+        return img
+
     def saveDrawing(self):
-        def _saveDrawing():
-            self.imageDraw.save('./save.png')
+        def _saveDrawing(n=0):
+            filename = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+            self.captureScreen().save(f'{filename}.png')
         return _saveDrawing
 
     def addAction(self, name, icon, fun):
@@ -273,6 +289,7 @@ ax.grid(True)
         penToolBar.setIconSize(QSize(50, 50))
         actionBar = QToolBar("Action", self)
         actionBar.setIconSize(QSize(50, 50))
+        self.toolBars = [penToolBar, actionBar]
         self.addToolBar(penToolBar)
         self.addToolBar(Qt.LeftToolBarArea, actionBar)
         
@@ -406,10 +423,10 @@ ax.grid(True)
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             sys.exit(0)
-        if event.button() == Qt.LeftButton:
+            
+        if event.button() == Qt.LeftButton and self.childAt(event.pos()) is None:
             self.drawing = True
-        # if event.button() == Qt.MiddleButton:
-        #     self.revert()
+
         if self.curr_method in ['drawRect', 'drawChart', 'drawLine', 'drawDot']:
             qp = QtGui.QPainter(self.imageDraw_bck)
             qp.drawImage(self.imageDraw_bck.rect(), self.imageDraw, self.imageDraw.rect())
@@ -481,7 +498,7 @@ ax.grid(True)
         self.update()
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.drawing == True:
             self.drawing = False
             self.path = None
 
@@ -492,7 +509,6 @@ ax.grid(True)
             p = QPixmap()
             p.convertFromImage(self.imageDraw)
             self.history.append(p)
-            print(self.history)
 
 def _grab_screen(screen_idx, screen):
     screen_geom = QDesktopWidget().screenGeometry(screen_idx)
