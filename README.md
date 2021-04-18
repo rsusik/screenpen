@@ -16,8 +16,9 @@ The behavior of he programs depends on the OS you use:
 * Left mouse button - drawing.
 * Right mouse button - quit.
 * Keyboard shortcuts:
-    * `Ctrl+Z` - undo
-    * `Ctrl+Y` - redo
+    * `Ctrl+Z` - undo,
+    * `Ctrl+Y` - redo,
+    * hold `Shift` - change mouse cursor icon to arrrow.
 
 ### Screenshot
 

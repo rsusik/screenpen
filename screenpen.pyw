@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu
 from PyQt5.QtGui import (
-    QIcon, QScreen, QPalette, QColor, 
+    QIcon, QScreen, QPalette, QColor, QCursor,
     QSyntaxHighlighter, QPixmap, QKeySequence
 )
 
@@ -98,12 +98,34 @@ class ScreenPenWindow(QMainWindow):
         self._setupCodes()
         self._createToolBars()
 
-
-        
         self.sc_undo = QShortcut(QKeySequence('Ctrl+Z'), self)
         self.sc_undo.activated.connect(self.undo)
         self.sc_redo = QShortcut(QKeySequence('Ctrl+Y'), self)
         self.sc_redo.activated.connect(self.redo)
+
+    def _setCursor(self, cursor):
+        if type(cursor) == str:
+            pixm = QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[cursor], None), encoding='utf-8')))
+            pixm = pixm.scaled(QSize(32, 32))
+            self.setCursor(QCursor(pixm, 2, 2))
+        elif type(cursor) == Qt.CursorShape:
+            self.setCursor(QCursor(cursor))
+
+    def keyPressEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        pressed = event.key()
+        print(pressed)
+        if (pressed==Qt.Key_Shift):
+            self._setCursor('arrow2')
+
+    def keyReleaseEvent(self, event):
+        if event.isAutoRepeat():
+            return
+        pressed = event.key()
+        print(pressed)
+        if (pressed==Qt.Key_Shift):
+            self._setCursor(Qt.ArrowCursor)
 
     def _setupIcons(self):
         self._icons = {}

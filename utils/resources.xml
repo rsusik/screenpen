@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-
 <codes>
    <code name="empty_chart" label="Empty Chart">
 fig = Figure((6, 4))
@@ -168,19 +167,17 @@ ax.bar(x, y, color=['b', 'g', 'r'])
 <icon name="save">
 <svg width="128" height="128" viewBox="0 0 128 128">
   <rect
-     ry="2.4345105"
-     y="11.407743"
-     x="10.002536"
-     height="105.09033"
-     width="109.43916"
-     id="rect817"
+     ry="2"
+     y="12"
+     x="10.-"
+     height="105"
+     width="110"
      style="fill:#f0f0f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none" />
   <rect
-     y="72.582008"
-     x="30.489487"
-     height="43.912529"
-     width="68.841042"
-     id="rect812"
+     y="72"
+     x="30"
+     height="44"
+     width="70"
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:8;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
   <rect
      ry="0"
@@ -188,16 +185,49 @@ ax.bar(x, y, color=['b', 'g', 'r'])
      x="44.529148"
      height="23.311754"
      width="10.847506"
-     id="rect814"
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:6;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
   <rect
-     y="10.914328"
-     x="26.534506"
-     height="35.632309"
-     width="77.534225"
-     id="rect816"
+     y="10"
+     x="26"
+     height="36"
+     width="77"
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
 </svg>
+</icon>
+<!--icon name="arrow">
+   <svg width="128" height="128" viewBox="0 0 128 128">
+   <path
+      style="fill:none;stroke:{STROKE};stroke-width:25;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+      d="M 115,112 14,14" />
+   <path
+      style="fill:none;stroke:{STROKE};stroke-width:25;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+      d="M 14,14 74,30" />
+   <path
+      style="fill:none;stroke:{STROKE};stroke-width:25;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+      d="M 14,14 26,68" />
+   </svg>
+</icon-->
+<icon name="arrow2">
+  <!--svg
+     version="1.1"
+     viewBox="0 0 128 128"
+     height="128"
+     width="128">
+    <path
+       d="M 17,5.5 A 11.5,11.5 0 0 0 12,7 11.5,11.5 0 0 0 11.5,7 11.5,11.5 0 0 0 11,7 11.5,11.5 0 0 0 7,11.5 11.5,11.5 0 0 0 7,11.5 11.5,11.5 0 0 0 7,12 11.5,11.5 0 0 0 6.5,21.5 L 17,70 a 11.5,11.5 0 1 0 22,-5 l -2.5,-12 66,64 a 11.5,11.5 0 1 0 16,-16 L 57,40 70,43 A 11.5,11.5 0 1 0 76,21 L 22,6 A 11.5,11.5 0 0 0 17,5.5 Z"
+       style="color:{STROKE};opacity:1;fill:{FILL};fill-opacity:1;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-opacity:1;" />
+  </svg-->
+  <svg
+     id="svg11"
+     version="1.1"
+     viewBox="0 0 128 128"
+     height="128"
+     width="128">
+    <path
+       id="path5"
+       d="M 17.071368,5.5942096 A 11.647268,11.647268 0 0 0 11.941623,6.9953813 11.647268,11.647268 0 0 0 11.579502,7.1846305 11.647268,11.647268 0 0 0 11.364777,7.3211083 11.647268,11.647268 0 0 0 7.4178399,11.257128 11.647268,11.647268 0 0 0 7.0902933,11.848531 11.647268,11.647268 0 0 0 6.9046834,12.190635 11.647268,11.647268 0 0 0 6.5007093,21.594863 L 17.309749,70.231902 a 11.647268,11.647268 0 1 0 22.739016,-5.051498 l -2.742293,-12.33759 66.182618,64.215516 a 11.647268,11.647268 0 1 0 16.22084,-16.71578 L 57.692612,40.166758 70.399602,43.555046 A 11.647268,11.647268 0 1 0 76.400984,21.048952 L 22.115586,6.57321 A 11.647268,11.647268 0 0 0 17.071368,5.5942096 Z"
+       style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+  </svg>
 </icon>
 </icons>
 </resources>
