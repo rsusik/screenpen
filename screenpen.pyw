@@ -24,7 +24,7 @@ from PyQt5.QtGui import (
 
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
-    QPushButton, QVBoxLayout, QListWidget, QFormLayout,
+    QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QFormLayout,
     QHBoxLayout, QGridLayout,
     QLineEdit, QPlainTextEdit,
     QShortcut
@@ -95,6 +95,7 @@ class ScreenPenWindow(QMainWindow):
         self.curr_pen = QtGui.QPen()
         self._setupTools()
         self._setupIcons()
+        self._setupCodes()
         self._createToolBars()
 
 
@@ -118,6 +119,28 @@ class ScreenPenWindow(QMainWindow):
         except FileNotFoundError as ex:
             print('ERROR: There is no resources.xml file')
             raise ex
+
+    class Code(object): pass
+    def _setupCodes(self):
+        self._codes = []
+        try:
+            DOMTree = minidom.parse(self.files.resources_xml)
+            codes = DOMTree.getElementsByTagName('code')
+            if len(codes) < 1:
+                raise Exception('ERROR: there are no codes in resources.xml file')
+            for code in codes:
+                if code.getAttribute('name')=='':
+                    raise Exception('ERROR: resources.xml: code doesnt contain "name" attribute')
+                codeobj = self.Code()
+                codeobj.name = code.getAttribute('name')
+                codeobj.label = code.getAttribute('name')
+                codeobj.code = code.firstChild.data
+                self._codes += [codeobj]
+                #self._codes[code.getAttribute('name')] = code.firstChild.data
+        except FileNotFoundError as ex:
+            print('ERROR: There is no resources.xml file')
+            raise ex
+        print(self._codes)
 
 
     def _applySvgConfig(self, svg_str, custom_colors_dict=None):
@@ -144,6 +167,8 @@ class ScreenPenWindow(QMainWindow):
         if platform.system() == 'Linux':
             self.imageDraw.fill(QtCore.Qt.transparent)
             self.imageDraw_bck.fill(QtCore.Qt.transparent)
+            # self.imageDraw.fill(QtCore.Qt.white)
+            # self.imageDraw_bck.fill(QtCore.Qt.white)
         else:
             qp = QtGui.QPainter(self.imageDraw)
             qp.drawPixmap(self.imageDraw.rect(), self.screen_pixmap, self.screen_pixmap.rect())
@@ -209,7 +234,7 @@ setattr(self, 'drawChart', drawChart)
             exec(self.code, {'self': self.parent, **globals()})
             self.accept()
 
-        def __init__(self, parent=None):
+        def __init__(self, parent):
             super().__init__(parent=parent)
             self.parent = parent
             self.setWindowTitle("Chart")
@@ -224,25 +249,29 @@ setattr(self, 'drawChart', drawChart)
             self.code    = QPlainTextEdit()
             highlight = syntax.PythonHighlighter(self.code.document())
             self.code.zoomIn(4)
-            self.code.setPlainText('''
-fig = Figure((6, 4))
-ax = fig.add_subplot(111)
-ax.set_xlim(0, 10)
-ax.set_ylim(0, 10)
-ax.set_xticks(list(range(10)))
-ax.set_yticks(list(range(10)))
-x = np.linspace(0, 9, 256)
-y = np.sin(x) + 2
-ax.plot(x, y)
-ax.grid(True)
-''')
+            self.code.setPlainText('')
 
-            self.layout = QFormLayout()
-            self.layout.addRow(QListWidget(), self.code)
-            self.layout.addRow(self.buttonBox)
-            #self.layout.addWidget(QListWidget(), 0, 0, 1, 1)
-            #self.layout.addWidget(self.code, 0, 1, 1, 3)
-            #self.layout.addWidget(self.buttonBox, 1, 1, 1, 1)
+            l = QListWidget()
+            for c in self.parent._codes:
+                ech = QListWidgetItem(c.label)
+                ech.code = c.code
+                ech.name = c.name
+                l.addItem(ech)
+            def code_clicked(c):
+                self.code.setPlainText(c.code)
+            l.itemClicked.connect(code_clicked)
+            self.layout = QVBoxLayout()
+            
+            buttons = QHBoxLayout()
+            buttons.addWidget(self.buttonBox, 1)
+
+            codelay = QHBoxLayout()
+            codelay.addWidget(l)
+            codelay.addWidget(self.code, 1)
+
+            self.layout.addLayout(codelay)
+            self.layout.addLayout(buttons)
+
             self.setLayout(self.layout)
 
     def showChart(self):
