@@ -182,7 +182,7 @@ class ScreenPenWindow(QMainWindow):
     def drawMatplotlib(self, qp:QtGui.QPainter, canvas:FigureCanvas, p1:QtCore.QPoint):
         size = canvas.size()
         width, height = size.width(), size.height()
-        im = QtGui.QImage(canvas.buffer_rgba(), width, height, QtGui.QImage.Format_ARGB32)
+        im = QtGui.QImage(canvas.buffer_rgba(), width, height, QtGui.QImage.Format_ARGB32).rgbSwapped()
         p2 = QtCore.QPoint(p1.x()+width, p1.y()+height) 
         qp.drawImage(QtCore.QRect(
             p1, 

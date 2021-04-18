@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+
+<codes>
+   <code name="empty_chart" label="Empty Chart">
+fig = Figure((6, 4))
+ax = fig.add_subplot(111)
+xmax, ymax = 10, 10
+ax.set_xlim(0, xmax)
+ax.set_ylim(0, ymax)
+ax.set_xticks(list(range(xmax)))
+ax.set_yticks(list(range(ymax)))
+ax.grid(True)
+   </code>
+   <code name="sinus" label="Sinus">
+fig = Figure((6, 4))
+ax = fig.add_subplot(111)
+x = np.linspace(0, 9, 256)
+y = np.sin(x)
+ax.plot(x, y)
+ax.grid(True)
+   </code>
+   <code name="bar" label="Bar chart">
+fig = Figure((6, 4))
+ax = fig.add_subplot(111)
+x = [1, 2, 3]
+y = [10, 5, 15]
+ax.bar(x, y, color=['b', 'g', 'r'])
+   </code>
+</codes>
+
 <icons>
 
 <icon name="circle">
