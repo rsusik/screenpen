@@ -114,17 +114,15 @@ class ScreenPenWindow(QMainWindow):
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
             return
-        pressed = event.key()
-        print(pressed)
-        if (pressed==Qt.Key_Shift):
+        k = event.key()
+        if (k==Qt.Key_Shift):
             self._setCursor('arrow2')
 
     def keyReleaseEvent(self, event):
         if event.isAutoRepeat():
             return
-        pressed = event.key()
-        print(pressed)
-        if (pressed==Qt.Key_Shift):
+        k = event.key()
+        if (k==Qt.Key_Shift):
             self._setCursor(Qt.ArrowCursor)
 
     def _setupIcons(self):
@@ -158,11 +156,9 @@ class ScreenPenWindow(QMainWindow):
                 codeobj.label = code.getAttribute('name')
                 codeobj.code = code.firstChild.data
                 self._codes += [codeobj]
-                #self._codes[code.getAttribute('name')] = code.firstChild.data
         except FileNotFoundError as ex:
             print('ERROR: There is no resources.xml file')
             raise ex
-        print(self._codes)
 
 
     def _applySvgConfig(self, svg_str, custom_colors_dict=None):
@@ -250,6 +246,16 @@ def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
 {sourcecode}
     canvas = FigureCanvas(fig)
     canvas.draw()
+    renderer = canvas.get_renderer()
+    fwidth, fheight = fig.get_size_inches()
+    fig_bbox = fig.get_window_extent(renderer)
+
+    text_bbox = t.get_window_extent(renderer)
+
+    tight_fwidth = text_bbox.width * fwidth / fig_bbox.width
+    tight_fheight = text_bbox.height * fheight / fig_bbox.height
+
+    fig.set_size_inches(tight_fwidth, tight_fheight)
     self.drawMatplotlib(qp, canvas, p1)
 setattr(self, 'drawChart', drawChart)
 '''
@@ -326,7 +332,7 @@ setattr(self, 'drawChart', drawChart)
     def saveDrawing(self):
         def _saveDrawing(n=0):
             filename = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
-            self.captureScreen().save(f'{filename}.png')
+            self.captureScreen().save(f'{filename}')
         return _saveDrawing
 
     def addAction(self, name, icon, fun):
@@ -345,13 +351,16 @@ setattr(self, 'drawChart', drawChart)
         self.addToolBar(Qt.LeftToolBarArea, actionBar)
         
         avail_colors = {
-            'black': Qt.black,
             'red': Qt.red,
             'green': Qt.green,
             'blue': Qt.blue,
-            'yellow': Qt.yellow,
+            'cyan': Qt.cyan,
             'magenta': Qt.magenta,
-            'cyan': Qt.cyan
+            'yellow': Qt.yellow,
+            'black': Qt.black,
+            'white': Qt.white,
+            'orange': QColor('#ff8000'),
+            'gray': QColor('#808080')
         }
 
         for acol in avail_colors:
