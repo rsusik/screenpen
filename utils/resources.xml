@@ -168,8 +168,8 @@ ax.bar(x, y, color=['b', 'g', 'r'])
 <svg width="128" height="128" viewBox="0 0 128 128">
   <rect
      ry="2"
-     y="12"
-     x="10.-"
+     y="10"
+     x="10"
      height="105"
      width="110"
      style="fill:#f0f0f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none" />
@@ -181,10 +181,10 @@ ax.bar(x, y, color=['b', 'g', 'r'])
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:8;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
   <rect
      ry="0"
-     y="83.170021"
-     x="44.529148"
-     height="23.311754"
-     width="10.847506"
+     y="83"
+     x="44"
+     height="23"
+     width="10"
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:6;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
   <rect
      y="10"
@@ -194,6 +194,28 @@ ax.bar(x, y, color=['b', 'g', 'r'])
      style="fill:#0000f0;fill-opacity:0;stroke:{STROKE};stroke-width:10;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
 </svg>
 </icon>
+
+<icon name="board">
+   <svg width="128" height="128" viewBox="0 0 128 128">
+  <rect
+     style="fill:{FILL};fill-opacity:255;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-miterlimit:4"
+     width="108"
+     height="70"
+     x="10"
+     y="10"
+     ry="1.6" />
+  <path
+     style="fill:none;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4"
+     d="M 56,82 30,120" />
+  <path
+     style="fill:none;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="M 68,82 94,120" />
+  <path
+     style="fill:none;stroke:{STROKE};stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 48,100 H 77" />
+   </svg>
+</icon>
+
 <!--icon name="arrow">
    <svg width="128" height="128" viewBox="0 0 128 128">
    <path

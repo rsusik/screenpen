@@ -185,8 +185,6 @@ class ScreenPenWindow(QMainWindow):
         if platform.system() == 'Linux':
             self.imageDraw.fill(QtCore.Qt.transparent)
             self.imageDraw_bck.fill(QtCore.Qt.transparent)
-            # self.imageDraw.fill(QtCore.Qt.white)
-            # self.imageDraw_bck.fill(QtCore.Qt.white)
         else:
             qp = QtGui.QPainter(self.imageDraw)
             qp.drawPixmap(self.imageDraw.rect(), self.screen_pixmap, self.screen_pixmap.rect())
@@ -206,6 +204,7 @@ class ScreenPenWindow(QMainWindow):
             p1, 
             p2
         ), im, im.rect())
+        
 
     def _setupTools(self):
         self.curr_br.setColor(self.curr_color)
@@ -246,14 +245,20 @@ def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
 {sourcecode}
     canvas = FigureCanvas(fig)
     canvas.draw()
+    canvas.setStyleSheet("background-color:transparent;")
+
     renderer = canvas.get_renderer()
     fwidth, fheight = fig.get_size_inches()
+    print(fwidth, fheight)
     fig_bbox = fig.get_window_extent(renderer)
+    print(fig_bbox)
 
     text_bbox = t.get_window_extent(renderer)
+    print(text_bbox)
 
     tight_fwidth = text_bbox.width * fwidth / fig_bbox.width
     tight_fheight = text_bbox.height * fheight / fig_bbox.height
+    print(tight_fwidth, tight_fheight)
 
     fig.set_size_inches(tight_fwidth, tight_fheight)
     self.drawMatplotlib(qp, canvas, p1)
@@ -344,10 +349,13 @@ setattr(self, 'drawChart', drawChart)
     def _createToolBars(self):
         penToolBar = QToolBar("Color", self)
         penToolBar.setIconSize(QSize(50, 50))
+        boardToolBar = QToolBar("Color", self)
+        boardToolBar.setIconSize(QSize(50, 50))
         actionBar = QToolBar("Action", self)
         actionBar.setIconSize(QSize(50, 50))
-        self.toolBars = [penToolBar, actionBar]
+        self.toolBars = [penToolBar, boardToolBar, actionBar]
         self.addToolBar(penToolBar)
+        self.addToolBar(boardToolBar)
         self.addToolBar(Qt.LeftToolBarArea, actionBar)
         
         avail_colors = {
@@ -365,7 +373,7 @@ setattr(self, 'drawChart', drawChart)
 
         for acol in avail_colors:
             penToolBar.addAction(
-                self.addAction(f'Set {acol} color', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
+                self.addAction(f'{acol}', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
             )
 
         actionBar.addAction(self.addAction("Path", self._getIcon('path'), self.setAction('drawPath')))
@@ -398,11 +406,13 @@ setattr(self, 'drawChart', drawChart)
         lineWidthButton.setMenu(lineWidthMenu)
         lineWidthButton.setToolTip('Line width')
         actionBar.addWidget(lineWidthButton)
-        
+        boardToolBar.addAction(self.addAction("Whiteboard", self._getIcon('board', custom_colors_dict={'FILL': 'white'}), self.setupBoard(Qt.white)))
+        boardToolBar.addAction(self.addAction("Blackboard", self._getIcon('board', custom_colors_dict={'FILL': 'black'}), self.setupBoard(Qt.black)))
+        boardToolBar.addAction(self.addAction("Remove drawings - transparent", self._getIcon('remove'), self.removeDrawing()))
         
         actionBar.addAction(self.addAction("Save image", self._getIcon('save'), self.saveDrawing())) # self.style().standardIcon(QtWidgets.QStyle.SP_DialogSaveButton)
 
-        actionBar.addAction(self.addAction("Remove drawings", self._getIcon('remove'), self.removeDrawing()))
+        
         
 
     def scaleCoords(self, coords):
@@ -447,6 +457,7 @@ setattr(self, 'drawChart', drawChart)
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
                 try:
                     self.drawChart(qp, self.end)
+                    self.update()
                 except Exception as ex:
                     self.drawing = False
                     msgBox = QtWidgets.QMessageBox()
@@ -475,9 +486,6 @@ setattr(self, 'drawChart', drawChart)
         canvasPainter.drawImage(self.rect(), self.imageDraw, self.imageDraw.rect())
         canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
         canvasPainter.end()
-
-
-
 
 
     def mousePressEvent(self, event):
@@ -569,6 +577,17 @@ setattr(self, 'drawChart', drawChart)
             p = QPixmap()
             p.convertFromImage(self.imageDraw)
             self.history.append(p)
+
+    def setupBoard(self, color):
+        def _setupBoard():
+            self.imageDraw.fill(color)
+            self.imageDraw_bck.fill(color)
+            self.update()
+            p = QPixmap()
+            p.convertFromImage(self.imageDraw)
+            self.history.append(p)
+        return _setupBoard
+
 
 def _grab_screen(screen_idx, screen):
     screen_geom = QDesktopWidget().screenGeometry(screen_idx)
