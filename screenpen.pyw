@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
-# Simple pen
 # Author:       Robert Susik
-# License:      MIT
 # Email:        robert.susik@gmail.com
 # ----------------------------------------------------------------------------
 
