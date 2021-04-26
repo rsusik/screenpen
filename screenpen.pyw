@@ -253,14 +253,14 @@ def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
     fig_bbox = fig.get_window_extent(renderer)
     print(fig_bbox)
 
-    text_bbox = t.get_window_extent(renderer)
-    print(text_bbox)
+    #text_bbox = t.get_window_extent(renderer)
+    #print(text_bbox)
 
-    tight_fwidth = text_bbox.width * fwidth / fig_bbox.width
-    tight_fheight = text_bbox.height * fheight / fig_bbox.height
-    print(tight_fwidth, tight_fheight)
+    #tight_fwidth = text_bbox.width * fwidth / fig_bbox.width
+    #tight_fheight = text_bbox.height * fheight / fig_bbox.height
+    #print(tight_fwidth, tight_fheight)
 
-    fig.set_size_inches(tight_fwidth, tight_fheight)
+    #fig.set_size_inches(tight_fwidth, tight_fheight)
     self.drawMatplotlib(qp, canvas, p1)
 setattr(self, 'drawChart', drawChart)
 '''
