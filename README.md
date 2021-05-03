@@ -1,12 +1,11 @@
-# Simple pen
+# ScreenPen
 
 ## Description
 
-Super simple screen annotation software which allows drawing directly on the screen:
+Screen annotation software which allows drawing directly on the screen. It is a free and multiplatform (all systems that support Python) alternative for tools such as Epic Pen. Supported shapes:
 * line,
 * rectangle,
 * chart (using matplotlib).
-The application allows writing directly on the screen.
 
 The behavior of he programs depends on the OS you use:
 * For Linux transparent background is used (you can see a video playing in the background).
@@ -20,11 +19,13 @@ The behavior of he programs depends on the OS you use:
     * `Ctrl+Y` - redo,
     * hold `Shift` - change mouse cursor icon to arrrow.
 
-### Screenshot
+### Demo (video)
 
-<img src="screenshot_1.png" height="300px" />
+https://user-images.githubusercontent.com/19404835/116938635-5e63a980-ac6b-11eb-818d-7723967e1d94.mp4?s=100
+
 
 *Note: The app is created ad-hoc only for my use case. It may contain bugs, and the code definitely is not clean.*
+
 
 ## Usage
 
