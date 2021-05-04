@@ -58,7 +58,7 @@ header .overlay {
 
 @media (pointer: coarse) and (hover: none) {
   header {
-    background: url('https://source.unsplash.com/XT5OInaElMw/1600x900') black no-repeat center center scroll;
+    background: url('assets/screen.png') black no-repeat center center scroll;
   }
   header video {
     display: none;
@@ -76,6 +76,12 @@ header .overlay {
       @media (min-width: 768px) {
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        #demo {
+          width: 100%;
         }
       }
 
@@ -650,10 +656,10 @@ fill="#FF00FF"/>
       </div>
     </header>
     
-<div class="container py-5" id="icon-grid" style="">
+<div class="container py-5" id="icon-grid" style="padding-right: 3em;">
   <h2 class="pb-2 border-bottom">Features</h2>
 
-  <div class="row row-cols-4" style="margin-top: 3em;">
+  <div class="row" style="margin-top: 3em;">
     <div class="col d-flex align-items-start" style="">
       <svg class="bi text-muted flex-shrink-0 me-3" width="1.75em" height="1.75em"><use xlink:href="#tools"/></svg>
       <div>
@@ -682,6 +688,8 @@ fill="#FF00FF"/>
         <p>The source code of the application is open and available publicly on github.</p>
       </div>
     </div>
+  </div>
+  <div class="row" style="margin-top: 3em;">
     <div class="col d-flex align-items-start">
       <svg class="bi text-muted flex-shrink-0 me-3" width="1.75em" height="1.75em">
         <use xlink:href="#colors"/>
@@ -757,8 +765,10 @@ fill="#FF00FF"/>
   
 
   <h3>Demo</h3>
-  <video playsinline="playsinline" noautoplay="noautoplay" height="400pt" muted="muted" loop="loop" style="display: block; margin: 0 auto;" controls="controls">
+  <video id="demo" playsinline="playsinline" noautoplay="noautoplay" height="400pt" muted="muted" loop="loop" style="display: block; margin: 0 auto;" controls="controls">
     <source src="assets/demo.mkv" type="video/mp4">
+    <source src="assets/demo.mp4" type="video/mp4">
+    <img src="assets/screen.png" />
   </video>
 </p>
   </div>
