@@ -13,7 +13,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu
+from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu, QColorDialog
 from PyQt5.QtGui import (
     QIcon, QScreen, QPalette, QColor, QCursor,
     QSyntaxHighlighter, QPixmap, QKeySequence
@@ -341,6 +341,15 @@ setattr(self, 'drawChart', drawChart)
             self.captureScreen().save(f'{filename}')
         return _saveDrawing
 
+    def colorPicker(self):
+        def _colorPicker():
+            color = QColorDialog.getColor()
+
+            if color.isValid():
+                print(color.name())
+                self.setColor(color)
+        return _colorPicker
+
     def addAction(self, name, icon, fun):
         action = QAction(icon, name, self)
         action.triggered.connect(fun)
@@ -377,6 +386,7 @@ setattr(self, 'drawChart', drawChart)
             penToolBar.addAction(
                 self.addAction(f'{acol}', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
             )
+        penToolBar.addAction(self.addAction(f'Color Picker', self._getIcon('rect_filled', {'FILL': 'red', 'STROKE': 'green'}), self.colorPicker()))
 
         actionBar.addAction(self.addAction("Path", self._getIcon('path'), self.setAction('drawPath')))
         actionBar.addAction(self.addAction("Rect", self._getIcon('rect'), self.setAction('drawRect')))
