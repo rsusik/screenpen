@@ -317,6 +317,9 @@ setattr(self, 'drawChart', drawChart)
 
     def removeDrawing(self):
         def _removeDrawing():
+            p = QPixmap()
+            p.convertFromImage(self.imageDraw)
+            self.history.append(p)
             self._clearCanvas()
         return _removeDrawing
 
@@ -366,7 +369,8 @@ setattr(self, 'drawChart', drawChart)
             'black': Qt.black,
             'white': Qt.white,
             'orange': QColor('#ff8000'),
-            'gray': QColor('#808080')
+            'gray': QColor('#808080'),
+            'transparent': Qt.transparent,
         }
 
         for acol in avail_colors:
