@@ -248,18 +248,7 @@ def drawChart(qp:QtGui.QPainter, p1:QtCore.QPoint):
 
     renderer = canvas.get_renderer()
     fwidth, fheight = fig.get_size_inches()
-    print(fwidth, fheight)
     fig_bbox = fig.get_window_extent(renderer)
-    print(fig_bbox)
-
-    #text_bbox = t.get_window_extent(renderer)
-    #print(text_bbox)
-
-    #tight_fwidth = text_bbox.width * fwidth / fig_bbox.width
-    #tight_fheight = text_bbox.height * fheight / fig_bbox.height
-    #print(tight_fwidth, tight_fheight)
-
-    #fig.set_size_inches(tight_fwidth, tight_fheight)
     self.drawMatplotlib(qp, canvas, p1)
 setattr(self, 'drawChart', drawChart)
 '''
@@ -318,9 +307,6 @@ setattr(self, 'drawChart', drawChart)
 
     def removeDrawing(self):
         def _removeDrawing():
-            # p = QPixmap()
-            # p.convertFromImage(self.imageDraw)
-            # self.history.append(p)
             self._clearCanvas()
         return _removeDrawing
 
@@ -347,8 +333,7 @@ setattr(self, 'drawChart', drawChart)
             color = QColorDialog.getColor()
 
             if color.isValid():
-                print(color.name())
-                self.setColor(color)
+                self.curr_color = color
         return _colorPicker
 
     def addAction(self, name, icon, fun):
@@ -380,14 +365,15 @@ setattr(self, 'drawChart', drawChart)
             'white': Qt.white,
             'orange': QColor('#ff8000'),
             'gray': QColor('#808080'),
-            'transparent': Qt.transparent,
         }
 
         for acol in avail_colors:
             penToolBar.addAction(
                 self.addAction(f'{acol}', self._getIcon('rect_filled', {'FILL': acol, 'STROKE': 'none'}), self.setColor(avail_colors[acol]))
             )
-        penToolBar.addAction(self.addAction(f'Color Picker', self._getIcon('rect_filled', {'FILL': 'red', 'STROKE': 'green'}), self.colorPicker()))
+        
+        penToolBar.addAction(self.addAction(f'Color Picker', self._getIcon('color_picker'), self.colorPicker()))
+        penToolBar.addAction(self.addAction(f'Eraser', self._getIcon('eraser'), self.setColor(Qt.transparent)))
 
         actionBar.addAction(self.addAction("Path", self._getIcon('path'), self.setAction('drawPath')))
         actionBar.addAction(self.addAction("Rect", self._getIcon('rect'), self.setAction('drawRect')))
@@ -435,6 +421,8 @@ setattr(self, 'drawChart', drawChart)
         return QtCore.QPoint(coords.x()*x_scale, coords.y()*y_scale)
 
     def paintEvent(self, event):
+        self._setupTools()
+
         qp = QtGui.QPainter(self.imageDraw)
         canvasPainter = QtGui.QPainter(self)
 
