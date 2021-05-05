@@ -692,7 +692,9 @@ if __name__ == '__main__':
             sys.exit(0)
         else:
             args.screen -= 1
-
+    else:
+        args.screen = 0
+        
     screen, screen_geom, pixmap = screens[args.screen]
         
     window = ScreenPenWindow(screen, screen_geom, pixmap)
