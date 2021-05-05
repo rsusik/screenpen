@@ -61,7 +61,7 @@ class ScreenPenWindow(QMainWindow):
         self.files = SimpleNamespace(
             resources_xml = os.path.join(prefix, 'utils/resources.xml')
         )
-                
+        
         self.screen = screen
         self.screen_pixmap = pixmap
         self.screen_geom = screen_geom
@@ -75,7 +75,7 @@ class ScreenPenWindow(QMainWindow):
         self._createCanvas()
         self._clearCanvas()
         
-        self.history = self.drawingHistory(10)
+        self.history = self.drawingHistory(30)
         self.history.append(self.screen_pixmap)
 
         self.begin = QtCore.QPoint()
@@ -175,22 +175,23 @@ class ScreenPenWindow(QMainWindow):
         return QIcon(QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[name], custom_colors_dict), encoding='utf-8'))))
 
     def _createCanvas(self):
+        self.background = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
         self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
         self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self._clearBackground()
         
+    def _clearBackground(self): # make background transparent
+        if platform.system() == 'Linux':
+            self.background.fill(QtCore.Qt.transparent)
+        else:
+            qp2 = QtGui.QPainter(self.background)
+            qp2.drawPixmap(self.background.rect(), self.screen_pixmap, self.screen_pixmap.rect())
+            qp2.end()
+        self.update()
 
     def _clearCanvas(self):
-        if platform.system() == 'Linux':
-            self.imageDraw.fill(QtCore.Qt.transparent)
-            self.imageDraw_bck.fill(QtCore.Qt.transparent)
-        else:
-            qp = QtGui.QPainter(self.imageDraw)
-            qp.drawPixmap(self.imageDraw.rect(), self.screen_pixmap, self.screen_pixmap.rect())
-            qp.end()
-
-            qp2 = QtGui.QPainter(self.imageDraw_bck)
-            qp2.drawPixmap(self.imageDraw_bck.rect(), self.screen_pixmap, self.screen_pixmap.rect())
-            qp2.end()
+        self.imageDraw.fill(QtCore.Qt.transparent)
+        self.imageDraw_bck.fill(QtCore.Qt.transparent)
         self.update()
 
     def drawMatplotlib(self, qp:QtGui.QPainter, canvas:FigureCanvas, p1:QtCore.QPoint):
@@ -317,9 +318,9 @@ setattr(self, 'drawChart', drawChart)
 
     def removeDrawing(self):
         def _removeDrawing():
-            p = QPixmap()
-            p.convertFromImage(self.imageDraw)
-            self.history.append(p)
+            # p = QPixmap()
+            # p.convertFromImage(self.imageDraw)
+            # self.history.append(p)
             self._clearCanvas()
         return _removeDrawing
 
@@ -420,13 +421,12 @@ setattr(self, 'drawChart', drawChart)
         actionBar.addWidget(lineWidthButton)
         boardToolBar.addAction(self.addAction("Whiteboard", self._getIcon('board', custom_colors_dict={'FILL': 'white'}), self.setupBoard(Qt.white)))
         boardToolBar.addAction(self.addAction("Blackboard", self._getIcon('board', custom_colors_dict={'FILL': 'black'}), self.setupBoard(Qt.black)))
-        boardToolBar.addAction(self.addAction("Remove drawings - transparent", self._getIcon('remove'), self.removeDrawing()))
+        boardToolBar.addAction(self.addAction("Transparent", self._getIcon('board_transparent', custom_colors_dict={'FILL': 'black'}), self._clearBackground))
+        boardToolBar.addAction(self.addAction("Remove drawings", self._getIcon('remove'), self.removeDrawing()))
         
         actionBar.addAction(self.addAction("Save image", self._getIcon('save'), self.saveDrawing())) # self.style().standardIcon(QtWidgets.QStyle.SP_DialogSaveButton)
 
         
-        
-
     def scaleCoords(self, coords):
         canvas_size = self.imageDraw.size()
         window_size = self.size()
@@ -439,7 +439,7 @@ setattr(self, 'drawChart', drawChart)
         canvasPainter = QtGui.QPainter(self)
 
         qp.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
-        canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
+        canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
 
         if Qt.LeftButton and self.drawing:
             qp.setPen(self.curr_pen)
@@ -495,6 +495,7 @@ setattr(self, 'drawChart', drawChart)
         qp.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
         qp.end()
         
+        canvasPainter.drawImage(self.rect(), self.background, self.background.rect())
         canvasPainter.drawImage(self.rect(), self.imageDraw, self.imageDraw.rect())
         canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
         canvasPainter.end()
@@ -592,12 +593,8 @@ setattr(self, 'drawChart', drawChart)
 
     def setupBoard(self, color):
         def _setupBoard():
-            self.imageDraw.fill(color)
-            self.imageDraw_bck.fill(color)
+            self.background.fill(color)
             self.update()
-            p = QPixmap()
-            p.convertFromImage(self.imageDraw)
-            self.history.append(p)
         return _setupBoard
 
 
@@ -642,8 +639,6 @@ def show_screen_selection(screens):
         lbl.setGraphicsEffect(shad)
         lay.addWidget(lbl, alignment=QtCore.Qt.AlignCenter)
         return btn
-
-
 
     dlg = QDialog()
     dlg.layout = QGridLayout()
