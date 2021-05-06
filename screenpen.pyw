@@ -316,6 +316,7 @@ setattr(self, 'drawChart', drawChart)
         img = self.imageDraw.copy()
         qp = QtGui.QPainter(img)
         qp.drawPixmap(img.rect(), self.screen_pixmap, self.screen_pixmap.rect())
+        qp.drawImage(img.rect(), self.background, self.background.rect())
         qp.drawImage(img.rect(), self.imageDraw, self.imageDraw.rect())
         qp.end()
         for tb in self.toolBars:
