@@ -690,7 +690,7 @@ if __name__ == '__main__':
             sys.exit(0)
         else:
             args.screen -= 1
-    else:
+    elif args.screen is None:
         args.screen = 0
         
     screen, screen_geom, pixmap = screens[args.screen]
