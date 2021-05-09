@@ -31,17 +31,8 @@ https://user-images.githubusercontent.com/19404835/116938635-5e63a980-ac6b-11eb-
 
 Tu run the program:
 
-### Pip
-
 ```bash
-pip install -r requirements.txt
-python screenpen.pyw
+pip install screenpen
+screenpen
 ```
 
-### Conda
-
-Once virtual env is activated:
-```bash
-conda install --file requirements.txt
-python screenpen.pyw
-```
