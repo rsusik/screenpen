@@ -4,7 +4,7 @@ compileone:
 clean:
 	rm -rf dist build screenpen.egg-info
 
-setup:
+setup: clean
 	python setup.py sdist bdist_wheel 
 
 pipinstall:
