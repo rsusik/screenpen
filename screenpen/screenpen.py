@@ -14,7 +14,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import QPoint, Qt, QSize
 from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu, QColorDialog
 from PyQt5.QtGui import (
     QIcon, QScreen, QPalette, QColor, QCursor,
@@ -120,13 +120,19 @@ class ScreenPenWindow(QMainWindow):
         self.sc_redo = QShortcut(QKeySequence('Ctrl+Y'), self)
         self.sc_redo.activated.connect(self.redo)
 
-    def _setCursor(self, cursor):
+    def _setCursor(self, cursor, hotx = None, hoty = None):
+        if hotx is None:
+            hotx = 2
+        if hoty is None:
+            hoty = 2
         if type(cursor) == str:
             pixm = QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[cursor], None), encoding='utf-8')))
             pixm = pixm.scaled(QSize(32, 32))
-            self.setCursor(QCursor(pixm, 2, 2))
+            self.setCursor(QCursor(pixm, hotx, hoty))
         elif type(cursor) == Qt.CursorShape:
             self.setCursor(QCursor(cursor))
+        elif type(cursor) == QPixmap:
+            self.setCursor(QCursor(cursor, hotx, hoty))
 
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
@@ -238,6 +244,36 @@ class ScreenPenWindow(QMainWindow):
             self._setupTools()
         return _setColor
 
+    def _getEraserPen(self, color=Qt.transparent, size=30):
+        pen = QtGui.QPen()
+        pen.setBrush(QtGui.QBrush(color))
+        pen.setStyle(Qt.SolidLine) ; pen.setCapStyle(Qt.RoundCap) 
+        pen.setJoinStyle(Qt.RoundJoin) ; pen.setWidth(size)
+        return pen
+
+    def setEraser(self):
+        def _setEraser():
+            pix = QPixmap()
+            img = QtGui.QImage(QSize(32, 32), QtGui.QImage.Format_ARGB32)
+            img.fill(Qt.transparent)
+            qp = QtGui.QPainter(img)
+            qp.setPen(self._getEraserPen(QColor('#7acfe6'), 30))
+            path = QtGui.QPainterPath()
+            path.moveTo(QPoint(16, 16))
+            path.cubicTo(QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
+            qp.drawPath(path)
+            qp.setPen(self._getEraserPen(QColor('#eccdec'), 26))
+            path = QtGui.QPainterPath()
+            path.moveTo(QPoint(16, 16))
+            path.cubicTo(QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
+            qp.drawPath(path)
+            qp.end()
+            pix = pix.fromImage(img)
+            self.setAction('drawEraser')()
+            self._setCursor(pix, 16, 16)
+            self._setupTools()
+        return _setEraser
+
     def setStyle(self, style):
         def _setStyle():
             self.curr_style = style
@@ -250,9 +286,11 @@ class ScreenPenWindow(QMainWindow):
             self._setupTools()
         return _setWidth
 
-    def setAction(self, action):
+    def setAction(self, action, cursor=None):
         def _setAction():
             self.curr_method = action
+            if cursor is None:
+                self._setCursor(Qt.ArrowCursor)
         return _setAction
 
     class ChartDialog(QDialog):
@@ -316,6 +354,7 @@ setattr(self, 'drawChart', drawChart)
 
     def showChart(self):
         def _showChart():
+            self._setCursor(Qt.ArrowCursor)
             dlg = self.ChartDialog(self)
             if dlg.exec_():
                 self.curr_method = 'drawChart'
@@ -393,7 +432,7 @@ setattr(self, 'drawChart', drawChart)
             )
         
         penToolBar.addAction(self.addAction(f'Color Picker', self._getIcon('color_picker'), self.colorPicker()))
-        penToolBar.addAction(self.addAction(f'Eraser', self._getIcon('eraser'), self.setColor(Qt.transparent)))
+        penToolBar.addAction(self.addAction(f'Eraser', self._getIcon('eraser'), self.setEraser()))
 
         actionBar.addAction(self.addAction("Path", self._getIcon('path'), self.setAction('drawPath')))
         actionBar.addAction(self.addAction("Rect", self._getIcon('rect'), self.setAction('drawRect')))
@@ -500,6 +539,17 @@ setattr(self, 'drawChart', drawChart)
                     self.update()
                     qp.setBrush(self.curr_br)
 
+            elif self.curr_method in ['drawEraser']:
+                if self.lastPoint != self.end:
+                    qp.setBrush(Qt.NoBrush)
+                    qp.setPen(self._getEraserPen(Qt.transparent))
+                    self.path.cubicTo(self.end, self.end, self.end)
+                    self.curr_args = [self.path]
+                    getattr(qp, 'drawPath')(*self.curr_args)
+                    self.lastPoint = self.end
+                    self.update()
+                    qp.setBrush(self.curr_br)
+
         qp.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
         qp.end()
         
@@ -523,7 +573,7 @@ setattr(self, 'drawChart', drawChart)
             self.begin = self.scaleCoords(event.pos())
             self.end = self.scaleCoords(event.pos())
             
-        elif self.curr_method in ['drawPath']:
+        elif self.curr_method in ['drawPath', 'drawEraser']:
             self.path = QtGui.QPainterPath()
             self.begin = self.scaleCoords(event.pos())
             self.end = self.scaleCoords(event.pos())
@@ -598,6 +648,7 @@ setattr(self, 'drawChart', drawChart)
             p = QPixmap()
             p.convertFromImage(self.imageDraw)
             self.history.append(p)
+
 
     def setupBoard(self, color):
         def _setupBoard():
