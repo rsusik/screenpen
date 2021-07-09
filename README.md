@@ -7,7 +7,7 @@ Screen annotation software which allows drawing directly on the screen. It is a 
 * rectangle,
 * chart (using matplotlib).
 
-The behavior of he programs depends on the OS you use:
+The behavior of the program depends on the OS you use:
 * For Linux transparent background is used (you can see a video playing in the background).
 * For Windows, the screenshot is taken, and the user draws on the captured image (you see a static image of the screen).
 
