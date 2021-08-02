@@ -1,4 +1,17 @@
-<img src="screenpen.png" alt="ScreenPen" />
+<p align="center">
+    <img src="screenpen.png" alt="ScreenPen" />
+</p>
+<p align="center">
+    <em>Multiplatform screen annotation software that allows drawing directly on the screen.</em>
+</p>
+<p align="center">
+<a href="https://pypi.org/project/screenpen" target="_blank">
+    <img src="https://img.shields.io/pypi/v/screenpen?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://github.com/rsusik/screenpen/blob/master/LICENSE" target="_blank">
+    <img src="https://img.shields.io/github/license/rsusik/screenpen" alt="Package version">
+</a>
+</p>
 
 ## Description
 
