@@ -1,4 +1,4 @@
-# ScreenPen
+<img src="screenpen.png" alt="ScreenPen" />
 
 ## Description
 
