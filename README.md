@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="screenpen.png" alt="ScreenPen" />
+    <img src="https://github.com/rsusik/screenpen/raw/master/screenpen.png" alt="ScreenPen" />
 </p>
 <p align="center">
     <em>Multiplatform screen annotation software that allows drawing directly on the screen.</em>
