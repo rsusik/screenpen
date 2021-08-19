@@ -21,7 +21,6 @@ from PyQt5.QtGui import (
     QSyntaxHighlighter, QPixmap, QKeySequence
 )
 
-
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
     QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QFormLayout,
@@ -47,7 +46,7 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
-#from pkg_resources import resource_filename, Requirement
+from .version import __version__
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 syntax_py_path = f'{dir_path}/utils/syntax.py'
@@ -65,15 +64,9 @@ class ScreenPenWindow(QMainWindow):
             prefix = sys._MEIPASS
             resources_xml_path = os.path.join(prefix, 'utils/resources.xml')
         except Exception:
-            prefix = '' #os.path.abspath(".")
-            #utils_path = resource_filename(Requirement.parse('screenpen'), "utils")
+            prefix = ''
             dir_path = os.path.dirname(os.path.realpath(__file__))
             resources_xml_path = f'{dir_path}/utils/resources.xml'
-        #resources_xml_path = f'{utils_path}/resources.xml'
-        # resources_xml_path = f'./utils/resources.xml'
-        # print(__file__)
-        # print(Requirement.parse('screenpen'))
-        # print(resource_filename(Requirement.parse('screenpen'), "utils"))
 
         
 
@@ -742,6 +735,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-v', '--version', dest='version', action='version', version=f'Version: {__version__}')
     parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
     parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
     parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')

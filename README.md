@@ -24,13 +24,7 @@ The behavior of the program depends on the OS you use:
 * For Linux transparent background is used (you can see a video playing in the background).
 * For Windows, the screenshot is taken, and the user draws on the captured image (you see a static image of the screen).
 
-### Controls
-* Left mouse button - drawing.
-* Right mouse button - quit.
-* Keyboard shortcuts:
-    * `Ctrl+Z` - undo,
-    * `Ctrl+Y` - redo,
-    * hold `Shift` - change mouse cursor icon to arrrow.
+
 
 ### Demo (video)
 
@@ -42,10 +36,20 @@ https://user-images.githubusercontent.com/19404835/116938635-5e63a980-ac6b-11eb-
 
 ## Usage
 
-Tu run the program:
+### Installation and execution
+
+Tu run the program you need to have Python installed and execute following:
 
 ```bash
 pip install screenpen
-screenpen
+screenpen                # or python -m screenpen
 ```
+
+### Controls
+* Left mouse button - drawing.
+* Right mouse button - quit.
+* Keyboard shortcuts:
+    * `Ctrl+Z` - undo,
+    * `Ctrl+Y` - redo,
+    * hold `Shift` - change mouse cursor icon to arrrow.
 
