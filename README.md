@@ -32,7 +32,7 @@ The behavior of the program depends on the OS you use:
 
 ### Demo (video)
 
-https://user-images.githubusercontent.com/19404835/116938635-5e63a980-ac6b-11eb-818d-7723967e1d94.mp4?s=100
+https://user-images.githubusercontent.com/19404835/130215780-705e4eb9-330b-4a91-bd1f-b9ec3843556e.mp4
 
 
 *Note: The app is created ad-hoc only for my use case. It may contain bugs, and the code definitely is not clean.*
