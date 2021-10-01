@@ -14,6 +14,9 @@
 <a href="https://pepy.tech/project/screenpen" target="_blank">
     <img src="https://static.pepy.tech/personalized-badge/screenpen?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads" alt="Number of downloads">
 </a>
+<a href="https://pepy.tech/project/screenpen" target="_blank">
+    <img src="https://static.pepy.tech/personalized-badge/screenpen?period=month&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads/month">
+</a>
 </p>
 
 ## Description
