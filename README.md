@@ -9,7 +9,10 @@
     <img src="https://img.shields.io/pypi/v/screenpen?color=%2334D058&label=pypi%20package" alt="Package version">
 </a>
 <a href="https://github.com/rsusik/screenpen/blob/master/LICENSE" target="_blank">
-    <img src="https://img.shields.io/github/license/rsusik/screenpen" alt="Package version">
+    <img src="https://img.shields.io/github/license/rsusik/screenpen" alt="License">
+</a>
+<a href="https://pepy.tech/project/screenpen" target="_blank">
+    <img src="https://static.pepy.tech/personalized-badge/screenpen?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads" alt="Number of downloads">
 </a>
 </p>
 
