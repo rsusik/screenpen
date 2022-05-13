@@ -121,11 +121,11 @@ class ScreenPenWindow(QMainWindow):
         if type(cursor) == str:
             pixm = QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[cursor], None), encoding='utf-8')))
             pixm = pixm.scaled(QSize(32, 32))
-            self.setCursor(QCursor(pixm, hotx, hoty))
+            self.setCursor(QCursor(pixm, int(hotx), int(hoty)))
         elif type(cursor) == Qt.CursorShape:
             self.setCursor(QCursor(cursor))
         elif type(cursor) == QPixmap:
-            self.setCursor(QCursor(cursor, hotx, hoty))
+            self.setCursor(QCursor(cursor, int(hotx), int(hoty)))
 
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
@@ -216,7 +216,7 @@ class ScreenPenWindow(QMainWindow):
         size = canvas.size()
         width, height = size.width(), size.height()
         im = QtGui.QImage(canvas.buffer_rgba(), width, height, QtGui.QImage.Format_ARGB32).rgbSwapped()
-        p2 = QtCore.QPoint(p1.x()+width, p1.y()+height) 
+        p2 = QtCore.QPoint(int(p1.x()+width), int(p1.y()+height))
         qp.drawImage(QtCore.QRect(
             p1, 
             p2
@@ -470,7 +470,7 @@ setattr(self, 'drawChart', drawChart)
         window_size = self.size()
         x_scale = canvas_size.width() / window_size.width()
         y_scale = canvas_size.height() / window_size.height()
-        return QtCore.QPoint(coords.x()*x_scale, coords.y()*y_scale)
+        return QtCore.QPoint(int(coords.x()*x_scale), int(coords.y()*y_scale))
 
     def paintEvent(self, event):
         self._setupTools()
