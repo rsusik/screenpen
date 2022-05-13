@@ -46,7 +46,7 @@ else:
         FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.figure import Figure
 
-from .version import __version__
+from screenpen.version import __version__
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 syntax_py_path = f'{dir_path}/utils/syntax.py'
@@ -678,7 +678,7 @@ def show_screen_selection(screens):
         btn = QPushButton()
         ico = QIcon(pixmap)
         btn.setIcon(ico)
-        btn.setIconSize(QSize(160, 160/(pixmap.rect().width()/pixmap.rect().height())))
+        btn.setIconSize(QSize(160, 160//(pixmap.rect().width()/pixmap.rect().height())))
 
         shad = QtWidgets.QGraphicsDropShadowEffect()
         shad.setOffset(-10, 10)
