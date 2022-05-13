@@ -1,4 +1,6 @@
 # 
+screenpen.build
+screenpen.dist
 *.svg
 *.png
 *.ipynb

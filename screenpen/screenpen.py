@@ -678,7 +678,7 @@ def show_screen_selection(screens):
         btn = QPushButton()
         ico = QIcon(pixmap)
         btn.setIcon(ico)
-        btn.setIconSize(QSize(160, 160//(pixmap.rect().width()/pixmap.rect().height())))
+        btn.setIconSize(QSize(int(160), int(160//(pixmap.rect().width()/pixmap.rect().height()))))
 
         shad = QtWidgets.QGraphicsDropShadowEffect()
         shad.setOffset(-10, 10)
