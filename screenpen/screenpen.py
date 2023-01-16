@@ -7,6 +7,7 @@
 
 #from .version import __version__  # noqa: F401,E402
 
+import subprocess
 import sys
 from datetime import datetime
 from matplotlib.backends.backend_qt5 import ToolbarQt
@@ -56,7 +57,7 @@ sys.modules['syntax'] = syntax
 spec.loader.exec_module(syntax)
 
 class ScreenPenWindow(QMainWindow):
-    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True): # app: QApplication
         super().__init__()
 
         # PATHS
@@ -77,8 +78,9 @@ class ScreenPenWindow(QMainWindow):
         self.screen = screen
         self.screen_pixmap = pixmap
         self.screen_geom = screen_geom
+        self.transparent_background = transparent_background
 
-        if platform.system() == 'Linux':
+        if self.transparent_background:
             self.setAttribute(Qt.WA_TranslucentBackground)
         self.move(screen_geom.topLeft())
         self.setGeometry(screen_geom)
@@ -199,7 +201,7 @@ class ScreenPenWindow(QMainWindow):
         self._clearBackground()
         
     def _clearBackground(self): # make background transparent
-        if platform.system() == 'Linux':
+        if self.transparent_background:
             self.background.fill(QtCore.Qt.transparent)
         else:
             qp2 = QtGui.QPainter(self.background)
@@ -672,6 +674,17 @@ def _get_screens(app):
         screens.append([screen, screen_geom, screen_pixmap])
     return screens
 
+
+def _is_transparency_supported():
+    try:
+        if platform.system() == 'Linux':
+            return '_NET_WM_WINDOW_OPACITY' in subprocess.run("xprop -root", shell=True, stdout=subprocess.PIPE).stdout.decode()
+        else:
+            return False
+    except:
+        return False
+
+
 def show_screen_selection(screens):
     number_of_screens = len(screens)
     def _getScreenButton(pixmap, label):
@@ -730,7 +743,7 @@ def _setPalette(app):
     app.setPalette(palette)
     app.setStyle("Fusion")
 
-#if __name__ == '__main__':
+
 def main():
     import argparse
 
@@ -739,6 +752,7 @@ def main():
     parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
     parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
     parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
+    parser.add_argument('-t', '--transparent', dest='transparent', help='Force transparent background. If you are sure your WM support it.', action='store_true')
     args = parser.parse_args()
     
     app = QApplication(sys.argv)
@@ -760,7 +774,9 @@ def main():
         
     screen, screen_geom, pixmap = screens[args.screen]
     
-    window = ScreenPenWindow(screen, screen_geom, pixmap)
+    use_transparency = args.transparent or _is_transparency_supported()
+    
+    window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
