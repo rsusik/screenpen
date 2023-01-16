@@ -7,6 +7,7 @@
 
 #from .version import __version__  # noqa: F401,E402
 
+import subprocess
 import sys
 from datetime import datetime
 from matplotlib.backends.backend_qt5 import ToolbarQt
@@ -79,7 +80,6 @@ class ScreenPenWindow(QMainWindow):
         self.screen_geom = screen_geom
         self.transparent_background = transparent_background
 
-        # if platform.system() == 'Linux':
         if self.transparent_background:
             self.setAttribute(Qt.WA_TranslucentBackground)
         self.move(screen_geom.topLeft())
@@ -652,28 +652,6 @@ setattr(self, 'drawChart', drawChart)
         return _setupBoard
 
 
-
-class TestWindow(QMainWindow):
-    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
-        super().__init__()
-
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.move(screen_geom.topLeft())
-        self.setGeometry(screen_geom)
-        self.activateWindow()
-        self.showFullScreen()
-        self.background = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.background.fill(QtCore.Qt.transparent)
-        qp2 = QtGui.QPainter(self.background)
-        qp2.drawPixmap(self.background.rect(), pixmap, pixmap.rect())
-        qp2.end()
-        self.update()
-        self.imageDraw.fill(QtCore.Qt.transparent)
-        self.imageDraw_bck.fill(QtCore.Qt.transparent)
-        self.update()
-
 def _grab_screen(screen_idx, screen):
     screen_geom = QDesktopWidget().screenGeometry(screen_idx)
     return (
@@ -697,19 +675,14 @@ def _get_screens(app):
     return screens
 
 
-def _is_transparent(screen_idx, screen, screen_geom, pixmap):
-    def _get_values():
-        scr = screen.grabWindow(0)
-        img = scr.toImage()
-        s = img.bits().asstring(img.byteCount())
-        return np.fromstring(s, dtype=np.uint8).reshape((img.byteCount()))
-
-    window = TestWindow(screen, screen_geom, pixmap)
-    bef = _get_values()
-    window.show()
-    aft = _get_values()
-
-    return ( (bef == aft).sum() / len(bef) ) > 0.99
+def _is_transparency_supported():
+    try:
+        if platform.system() == 'Linux':
+            return '_NET_WM_WINDOW_OPACITY' in subprocess.run("xprop -root", shell=True, stdout=subprocess.PIPE).stdout.decode()
+        else:
+            return False
+    except:
+        return False
 
 
 def show_screen_selection(screens):
@@ -801,7 +774,7 @@ def main():
         
     screen, screen_geom, pixmap = screens[args.screen]
     
-    use_transparency = args.transparent or all(_is_transparent(args.screen, screen, screen_geom, pixmap) for i in range(5))
+    use_transparency = args.transparent or _is_transparency_supported()
     
     window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
     sys.exit(app.exec_())
