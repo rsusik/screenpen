@@ -56,7 +56,7 @@ sys.modules['syntax'] = syntax
 spec.loader.exec_module(syntax)
 
 class ScreenPenWindow(QMainWindow):
-    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True): # app: QApplication
         super().__init__()
 
         # PATHS
@@ -77,8 +77,10 @@ class ScreenPenWindow(QMainWindow):
         self.screen = screen
         self.screen_pixmap = pixmap
         self.screen_geom = screen_geom
+        self.transparent_background = transparent_background
 
-        if platform.system() == 'Linux':
+        # if platform.system() == 'Linux':
+        if self.transparent_background:
             self.setAttribute(Qt.WA_TranslucentBackground)
         self.move(screen_geom.topLeft())
         self.setGeometry(screen_geom)
@@ -199,7 +201,7 @@ class ScreenPenWindow(QMainWindow):
         self._clearBackground()
         
     def _clearBackground(self): # make background transparent
-        if platform.system() == 'Linux':
+        if self.transparent_background:
             self.background.fill(QtCore.Qt.transparent)
         else:
             qp2 = QtGui.QPainter(self.background)
@@ -650,6 +652,28 @@ setattr(self, 'drawChart', drawChart)
         return _setupBoard
 
 
+
+class TestWindow(QMainWindow):
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None): # app: QApplication
+        super().__init__()
+
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.move(screen_geom.topLeft())
+        self.setGeometry(screen_geom)
+        self.activateWindow()
+        self.showFullScreen()
+        self.background = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self.background.fill(QtCore.Qt.transparent)
+        qp2 = QtGui.QPainter(self.background)
+        qp2.drawPixmap(self.background.rect(), pixmap, pixmap.rect())
+        qp2.end()
+        self.update()
+        self.imageDraw.fill(QtCore.Qt.transparent)
+        self.imageDraw_bck.fill(QtCore.Qt.transparent)
+        self.update()
+
 def _grab_screen(screen_idx, screen):
     screen_geom = QDesktopWidget().screenGeometry(screen_idx)
     return (
@@ -671,6 +695,19 @@ def _get_screens(app):
         screen_geom, screen_pixmap = _grab_screen(screen_idx, screen)
         screens.append([screen, screen_geom, screen_pixmap])
     return screens
+
+
+def _is_transparent(screen_idx, screen, screen_geom, pixmap):
+    def _get_values():
+        scr = _grab_screen(screen_idx, screen)
+        img = scr[1].toImage()
+        return img.bits().asstring(img.byteCount())
+    window = TestWindow(screen, screen_geom, pixmap)
+    bef = _get_values()
+    window.show()
+    aft = _get_values()
+    return bef == aft
+
 
 def show_screen_selection(screens):
     number_of_screens = len(screens)
@@ -739,6 +776,7 @@ def main():
     parser.add_argument('-1', nargs='?', type=int, dest='screen', const='0')
     parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
     parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
+    parser.add_argument('-t', '--transparent', dest='transparent', help='Force transparent background. If you are sure your WM support it.', action='store_true')
     args = parser.parse_args()
     
     app = QApplication(sys.argv)
@@ -760,7 +798,9 @@ def main():
         
     screen, screen_geom, pixmap = screens[args.screen]
     
-    window = ScreenPenWindow(screen, screen_geom, pixmap)
+    use_transparency = args.transparent or _is_transparent(args.screen, screen, screen_geom, pixmap)
+    
+    window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

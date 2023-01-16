@@ -30,9 +30,10 @@ Supported shapes:
 * rectangle,
 * chart (using matplotlib).
 
-The behavior of the program depends on the OS you use:
-* in Linux, a transparent background is used (you can see a video playing in the background),
-* and in Windows, the screenshot is taken, and the user draws on the captured image (you see a static image of the screen).
+The behavior of the program depends on the Window System you use:
+* if the system supports "live transparency then a transparent background is used (you can see a video playing in the background),
+* if not then the screenshot is taken, and the user draws on the captured image (you see a static image of the screen),
+* Sometimes your WM may be detected as not supporting "live transparency". In that case try running with `-t` parameter to force it._
 
 
 
@@ -41,7 +42,7 @@ The behavior of the program depends on the OS you use:
 https://user-images.githubusercontent.com/19404835/130215780-705e4eb9-330b-4a91-bd1f-b9ec3843556e.mp4
 
 
-*Note: The app is created ad-hoc only for my use case. It may contain bugs, and the code definitely is not clean.*
+*Note: The app is created ad-hoc only for my use case. It may contain bugs...*
 
 
 ## Usage
@@ -53,6 +54,12 @@ Tu run the program you need to have Python installed and execute following:
 ```bash
 pip install screenpen
 screenpen                # or python -m screenpen
+```
+
+**NOTE: Your WM may be detected as not supporting "live transparency". In that case try running with `-t` parameter:**
+
+```bash
+screenpen -t
 ```
 
 ### Controls
