@@ -699,14 +699,17 @@ def _get_screens(app):
 
 def _is_transparent(screen_idx, screen, screen_geom, pixmap):
     def _get_values():
-        scr = _grab_screen(screen_idx, screen)
-        img = scr[1].toImage()
-        return img.bits().asstring(img.byteCount())
+        scr = screen.grabWindow(0)
+        img = scr.toImage()
+        s = img.bits().asstring(img.byteCount())
+        return np.fromstring(s, dtype=np.uint8).reshape((img.byteCount()))
+
     window = TestWindow(screen, screen_geom, pixmap)
     bef = _get_values()
     window.show()
     aft = _get_values()
-    return bef == aft
+
+    return ( (bef == aft).sum() / len(bef) ) > 0.99
 
 
 def show_screen_selection(screens):
@@ -767,7 +770,7 @@ def _setPalette(app):
     app.setPalette(palette)
     app.setStyle("Fusion")
 
-#if __name__ == '__main__':
+
 def main():
     import argparse
 
@@ -798,7 +801,7 @@ def main():
         
     screen, screen_geom, pixmap = screens[args.screen]
     
-    use_transparency = args.transparent or _is_transparent(args.screen, screen, screen_geom, pixmap)
+    use_transparency = args.transparent or all(_is_transparent(args.screen, screen, screen_geom, pixmap) for i in range(5))
     
     window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
     sys.exit(app.exec_())
