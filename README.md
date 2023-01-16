@@ -33,7 +33,7 @@ Supported shapes:
 The behavior of the program depends on the Window System you use:
 * if the system supports "live transparency then a transparent background is used (you can see a video playing in the background),
 * if not then the screenshot is taken, and the user draws on the captured image (you see a static image of the screen),
-* Sometimes your WM may be detected as not supporting "live transparency". In that case try running with `-t` parameter to force it._
+* sometimes your WM may be detected as not supporting "live transparency". In that case try running with `-t` parameter to force it._
 
 
 
