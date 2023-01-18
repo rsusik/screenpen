@@ -772,6 +772,9 @@ def main():
     elif args.screen is None:
         args.screen = 0
         
+    if args.screen >= len(screens):
+        raise Exception(f'Error: You don\'t have so many screens ({args.screen+1}). Try lower number.')
+    
     screen, screen_geom, pixmap = screens[args.screen]
     
     use_transparency = args.transparent or _is_transparency_supported()
