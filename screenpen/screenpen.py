@@ -7,6 +7,18 @@
 
 #from .version import __version__  # noqa: F401,E402
 
+import pkg_resources
+
+try:
+    pkg_resources.get_distribution("PySide6")
+    print('\033[41m', end='')
+    print('=========================> WARNING <===========================')
+    print('>       PySide6 is installed but PyQt5 only is expected.      <')
+    print('>          Errors may appear. Please remove PySide6.          <')
+    print('===============================================================\033[0m')
+except pkg_resources.DistributionNotFound:
+    pass
+
 import subprocess
 import sys
 from datetime import datetime
@@ -676,12 +688,15 @@ def _get_screens(app):
 
 
 def _is_transparency_supported():
+    warn = 'INFO: Your system may support transparency but we cannot detect it. You may try to use -t parameter to force it.'
     try:
         if platform.system() == 'Linux':
             return '_NET_WM_WINDOW_OPACITY' in subprocess.run("xprop -root", shell=True, stdout=subprocess.PIPE).stdout.decode()
         else:
+            print(warn)
             return False
     except:
+        print(warn)
         return False
 
 
