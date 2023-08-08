@@ -78,7 +78,7 @@ screenpen -t
 Screenpen (from 0.2 version) is compatible with PyQt5 and PyQt6, nevertheless the PyQt5 is currently in the requirements and recommended.
 It is possible to run it using PyQt6 by running:
 ```
-pip install screenpen --no-deps
 pip install matplotlib>=3.2 numpy>=1.8 PyQt6
+pip install screenpen --no-deps
 ```
 
