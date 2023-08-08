@@ -10,6 +10,25 @@
 import pkg_resources
 
 try:
+    import PyQt5
+    print("PyQt5 is installed.")
+    pyqt_version = 5
+except ImportError:
+    try:
+        import PyQt6
+        print("PyQt6 is installed.")
+        pyqt_version = 6
+    except ImportError:
+        print("PyQt5 nor PyQt6 is installed.")
+        print("Please install PyQt5 or PyQt6 by running:")
+        print("pip install PyQt5")
+        print("or")
+        print("pip install PyQt6")
+        print("Exiting...")
+        exit(1)
+
+
+try:
     pkg_resources.get_distribution("PySide6")
     print('\033[41m', end='')
     print('=========================> WARNING <===========================')
@@ -22,25 +41,311 @@ except pkg_resources.DistributionNotFound:
 import subprocess
 import sys
 from datetime import datetime
-from matplotlib.backends.backend_qt5 import ToolbarQt
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
-from PyQt5.QtCore import QPoint, Qt, QSize
-from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu, QColorDialog
-from PyQt5.QtGui import (
-    QIcon, QScreen, QPalette, QColor, QCursor,
-    QSyntaxHighlighter, QPixmap, QKeySequence
-)
 
-from PyQt5.QtWidgets import (
-    QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
-    QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QFormLayout,
-    QHBoxLayout, QGridLayout,
-    QLineEdit, QPlainTextEdit,
-    QShortcut
-)
+if pyqt_version == 5:
+    from PyQt5 import QtGui
+    from PyQt5 import QtWidgets
+    from PyQt5 import QtCore
+    from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
+    from PyQt5.QtCore import QPoint, Qt, QSize
+    from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu, QColorDialog
+    from PyQt5.QtGui import (
+        QIcon, QScreen, QPalette, QColor, QCursor,
+        QSyntaxHighlighter, QPixmap, QKeySequence
+    )
+
+    from PyQt5.QtWidgets import (
+        QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
+        QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QFormLayout,
+        QHBoxLayout, QGridLayout,
+        QLineEdit, QPlainTextEdit,
+        QShortcut
+    )
+
+    def _create_palette():
+        return QPalette()
+    
+    PALETTE_PROPS = {
+        'window': QPalette.Window,
+        'windowText': QPalette.WindowText,
+        'base': QPalette.Base,
+        'alternateBase': QPalette.AlternateBase,
+        'toolTipBase': QPalette.ToolTipBase,
+        'toolTipText': QPalette.ToolTipText,
+        'text': QPalette.Text,
+        'button': QPalette.Button,
+        'buttonText': QPalette.ButtonText,
+        'brightText': QPalette.BrightText,
+        'link': QPalette.Link,
+        'highlight': QPalette.Highlight,
+        'highlightedText': QPalette.HighlightedText,
+    }
+
+    def _get_color_from_RGB(r, g, b):
+        return QColor(r, g, b)
+
+    def _set_palette_color(palette, property, value):
+        return palette.setColor(property, value)
+    
+    # _set_palette_color(_create_palette(), PALETTE_PROPS['window'], _get_color_from_RGB(53, 53, 53))
+    
+    ALIGNMENT = {
+        'center': QtCore.Qt.AlignCenter,
+        'left': QtCore.Qt.AlignLeft,
+        'right': QtCore.Qt.AlignRight,
+    }
+
+    COLORS = {
+        'black': Qt.black,
+        'white': Qt.white,
+        'red': Qt.red,
+        'green': Qt.green,
+        'blue': Qt.blue,
+        'cyan': Qt.cyan,
+        'magenta': Qt.magenta,
+        'yellow': Qt.yellow,
+        'gray': Qt.gray,
+        'darkGray': Qt.darkGray,
+        'lightGray': Qt.lightGray,
+        'transparent': Qt.transparent,
+        'darkRed': Qt.darkRed,
+        'darkGreen': Qt.darkGreen,
+        'darkBlue': Qt.darkBlue,
+        'darkCyan': Qt.darkCyan,
+        'darkMagenta': Qt.darkMagenta,
+        'darkYellow': Qt.darkYellow,
+    }
+
+    def _execute_dialog(dlg):
+        return dlg.exec_()
+    
+    WINDOW_ATTRS = {
+        'translucentBackground': QtCore.Qt.WA_TranslucentBackground,
+    }
+
+    IMAGE_FORMATS = {
+        'ARGB32': QtGui.QImage.Format_ARGB32,
+    }
+
+    PEN_STYLES = {
+        'solidLine': Qt.SolidLine,
+        'dashLine': Qt.DashLine,
+        'dotLine': Qt.DotLine,
+        'dashDotLine': Qt.DashDotLine,
+        'roundCap': Qt.RoundCap,
+        'squareCap': Qt.SquareCap,
+        'flatCap': Qt.FlatCap,
+        'roundJoin': Qt.RoundJoin,
+    }
+
+    TOOLBAR_AREAS = {
+        'leftToolBarArea': Qt.LeftToolBarArea,
+        'rightToolBarArea': Qt.RightToolBarArea,
+        'topToolBarArea': Qt.TopToolBarArea,
+        'bottomToolBarArea': Qt.BottomToolBarArea,
+    }
+
+    TOOL_BUTTON_STYLE = {
+        'toolButtonIconOnly': Qt.ToolButtonIconOnly,
+    }
+
+    POPUP_MODE = {
+        'instantPopup': QToolButton.InstantPopup
+    }
+
+    COMPOSITION_MODE = {
+        'source': QtGui.QPainter.CompositionMode_Source,
+        'source_over': QtGui.QPainter.CompositionMode_SourceOver,
+    }
+
+    BUTTONS = {
+        'left': Qt.LeftButton,
+        'right': Qt.RightButton,
+        'middle': Qt.MiddleButton,
+    }
+
+    BRUSHES = {
+        'no_brush': Qt.NoBrush,
+    }
+
+    CURSORS = {
+        'arrow_cursor': Qt.ArrowCursor,
+    }
+
+    KEYS = {
+        'escape': Qt.Key_Escape,
+        'enter': Qt.Key_Enter,
+        'return': Qt.Key_Return,
+        'shift': Qt.Key_Shift,
+    }
+
+    def _path_move_to(path, point):
+        return path.moveTo(point)
+    
+    def _path_cubic_to(path, point1, point2, point3):
+        return path.cubicTo(point1, point2, point3)
+    
+    DIALOG_BUTTONS = {
+        'ok': QDialogButtonBox.Ok,
+        'cancel': QDialogButtonBox.Cancel,
+    }
+
+
+elif pyqt_version == 6:
+    from PyQt6 import QtGui
+    from PyQt6 import QtWidgets
+    from PyQt6 import QtCore
+    from PyQt6.QtWidgets import QMainWindow, QApplication #, QDesktopWidget
+    from PyQt6.QtCore import QPoint, Qt, QSize
+    from PyQt6.QtWidgets import QToolBar, QDialog, QToolButton, QMenu, QColorDialog
+    from PyQt6.QtGui import (
+        QGuiApplication,
+        QIcon, QScreen, QPalette, QColor, QCursor,
+        QSyntaxHighlighter, QPixmap, QKeySequence,
+        QAction, QShortcut
+    )
+
+    from PyQt6.QtWidgets import (
+        QApplication, QDialog, QDialogButtonBox, QLabel, QMainWindow,
+        QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QFormLayout,
+        QHBoxLayout, QGridLayout,
+        QLineEdit, QPlainTextEdit,
+        #QShortcut
+    )
+
+    def _create_palette():
+        return QPalette()
+
+    PALETTE_PROPS = {
+        'window': 'window',
+        'windowText': 'windowText',
+        'base': 'base',
+        'alternateBase': 'alternateBase',
+        'toolTipBase': 'toolTipBase',
+        'toolTipText': 'toolTipText',
+        'text': 'text',
+        'button': 'button',
+        'buttonText': 'buttonText',
+        'brightText': 'brightText',
+        'link': 'link',
+        'highlight': 'highlight',
+        'highlightedText': 'highlightedText',
+    }
+
+
+    def _get_color_from_RGB(r, g, b):
+        return QColor(r, g, b)
+
+    def _set_palette_color(palette, property, value):
+        return getattr(palette, property)().setColor(value)
+
+    # _set_palette_color(_create_palette(), PALETTE_PROPS['window'], _get_color_from_RGB(53, 53, 53))
+
+    ALIGNMENT = {
+        'center': Qt.AlignmentFlag.AlignCenter,
+        'left': Qt.AlignmentFlag.AlignLeft,
+        'right': Qt.AlignmentFlag.AlignRight,
+    }
+
+    COLORS = {
+        'black': QtGui.QColorConstants.Black,
+        'white': QtGui.QColorConstants.White,
+        'red': QtGui.QColorConstants.Red,
+        'green': QtGui.QColorConstants.Green,
+        'blue': QtGui.QColorConstants.Blue,
+        'cyan': QtGui.QColorConstants.Cyan,
+        'magenta': QtGui.QColorConstants.Magenta,
+        'yellow': QtGui.QColorConstants.Yellow,
+        'gray': QtGui.QColorConstants.Gray,
+        'darkGray': QtGui.QColorConstants.DarkGray,
+        'lightGray': QtGui.QColorConstants.LightGray,
+        'transparent': QtGui.QColorConstants.Transparent,
+        'darkRed': QtGui.QColorConstants.DarkRed,
+        'darkGreen': QtGui.QColorConstants.DarkGreen,
+        'darkBlue': QtGui.QColorConstants.DarkBlue,
+        'darkCyan': QtGui.QColorConstants.DarkCyan,
+        'darkMagenta': QtGui.QColorConstants.DarkMagenta,
+        'darkYellow': QtGui.QColorConstants.DarkYellow,
+    }
+
+    def _execute_dialog(dlg):
+        return dlg.exec()
+    
+    WINDOW_ATTRS = {
+        'translucentBackground': QtCore.Qt.WidgetAttribute.WA_TranslucentBackground,
+    }
+    
+    IMAGE_FORMATS = {
+        'ARGB32': QtGui.QImage.Format.Format_ARGB32,
+    }
+
+    PEN_STYLES = {
+        'solidLine': QtCore.Qt.PenStyle.SolidLine,
+        'dashLine': QtCore.Qt.PenStyle.DashLine,
+        'dotLine': QtCore.Qt.PenStyle.DotLine,
+        'dashDotLine': QtCore.Qt.PenStyle.DashDotLine,
+        'roundCap': QtCore.Qt.PenCapStyle.RoundCap,
+        'squareCap': QtCore.Qt.PenCapStyle.SquareCap,
+        'flatCap': QtCore.Qt.PenCapStyle.FlatCap,
+        'roundJoin': QtCore.Qt.PenJoinStyle.RoundJoin,
+    }
+
+    TOOLBAR_AREAS = {
+        'leftToolBarArea': Qt.ToolBarArea.LeftToolBarArea,
+        'rightToolBarArea': Qt.ToolBarArea.RightToolBarArea,
+        'topToolBarArea': Qt.ToolBarArea.TopToolBarArea,
+        'bottomToolBarArea': Qt.ToolBarArea.BottomToolBarArea,
+    }
+
+    TOOL_BUTTON_STYLE = {
+        'toolButtonIconOnly': QtCore.Qt.ToolButtonStyle.ToolButtonIconOnly,
+    }
+
+    POPUP_MODE = {
+        'instantPopup': QtWidgets.QToolButton.ToolButtonPopupMode.InstantPopup
+    }
+
+    COMPOSITION_MODE = {
+        'source': QtGui.QPainter.CompositionMode.CompositionMode_Source,
+        'source_over': QtGui.QPainter.CompositionMode.CompositionMode_SourceOver,
+    }
+
+    BUTTONS = {
+        'left': QtCore.Qt.MouseButton.LeftButton,
+        'right': QtCore.Qt.MouseButton.RightButton,
+        'middle': QtCore.Qt.MouseButton.MiddleButton,
+    }
+
+    BRUSHES = {
+        'no_brush': QtCore.Qt.BrushStyle.NoBrush,
+    }
+
+    CURSORS = {
+        'arrow_cursor': QtCore.Qt.CursorShape.ArrowCursor,
+    }
+
+    KEYS = {
+        'escape': QtCore.Qt.Key.Key_Escape,
+        'enter': QtCore.Qt.Key.Key_Enter,
+        'return': QtCore.Qt.Key.Key_Return,
+        'shift': QtCore.Qt.Key.Key_Shift,
+    }
+
+    def _path_move_to(path, point):
+        path.moveTo(point.x(), point.y())
+
+    def _path_cubic_to(path, point1, point2, point3):
+        return path.cubicTo(
+            point1.x(), point1.y(), 
+            point2.x(), point2.y(), 
+            point3.x(), point3.y(), 
+        )
+    
+    DIALOG_BUTTONS = {
+        'ok': QDialogButtonBox.StandardButton.Ok,
+        'cancel': QDialogButtonBox.StandardButton.Cancel,
+    }
+    
 
 import numpy as np
 import platform
@@ -93,7 +398,7 @@ class ScreenPenWindow(QMainWindow):
         self.transparent_background = transparent_background
 
         if self.transparent_background:
-            self.setAttribute(Qt.WA_TranslucentBackground)
+            self.setAttribute(WINDOW_ATTRS['translucentBackground'])
         self.move(screen_geom.topLeft())
         self.setGeometry(screen_geom)
         self.activateWindow()
@@ -110,10 +415,10 @@ class ScreenPenWindow(QMainWindow):
 
         self.drawing = False
         self.curr_method = 'drawPath'
-        self.curr_color = Qt.red
-        self.curr_style = Qt.SolidLine
-        self.curr_capstyle = Qt.RoundCap
-        self.curr_joinstyle = Qt.RoundJoin
+        self.curr_color = COLORS['red']
+        self.curr_style = PEN_STYLES['solidLine']
+        self.curr_capstyle = PEN_STYLES['roundCap']
+        self.curr_joinstyle = PEN_STYLES['roundJoin']
         self.curr_width = 3
         self.curr_br = QtGui.QBrush(self.curr_color)
         self.curr_pen = QtGui.QPen()
@@ -145,14 +450,14 @@ class ScreenPenWindow(QMainWindow):
         if event.isAutoRepeat():
             return
         k = event.key()
-        if (k==Qt.Key_Shift):
+        if (k==KEYS['shift']):
             self._setCursor('arrow2')
 
     def keyReleaseEvent(self, event):
         if event.isAutoRepeat():
             return
         k = event.key()
-        if (k==Qt.Key_Shift):
+        if (k==KEYS['shift']):
             self._setCursor(Qt.ArrowCursor)
 
     def _setupIcons(self):
@@ -207,14 +512,14 @@ class ScreenPenWindow(QMainWindow):
         return QIcon(QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[name], custom_colors_dict), encoding='utf-8'))))
 
     def _createCanvas(self):
-        self.background = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
-        self.imageDraw_bck = QtGui.QImage(self.size(), QtGui.QImage.Format_ARGB32)
+        self.background = QtGui.QImage(self.size(), IMAGE_FORMATS['ARGB32'])
+        self.imageDraw = QtGui.QImage(self.size(), IMAGE_FORMATS['ARGB32'])
+        self.imageDraw_bck = QtGui.QImage(self.size(), IMAGE_FORMATS['ARGB32'])
         self._clearBackground()
         
     def _clearBackground(self): # make background transparent
         if self.transparent_background:
-            self.background.fill(QtCore.Qt.transparent)
+            self.background.fill(COLORS['transparent'])
         else:
             qp2 = QtGui.QPainter(self.background)
             qp2.drawPixmap(self.background.rect(), self.screen_pixmap, self.screen_pixmap.rect())
@@ -222,14 +527,14 @@ class ScreenPenWindow(QMainWindow):
         self.update()
 
     def _clearCanvas(self):
-        self.imageDraw.fill(QtCore.Qt.transparent)
-        self.imageDraw_bck.fill(QtCore.Qt.transparent)
+        self.imageDraw.fill(COLORS['transparent'])
+        self.imageDraw_bck.fill(COLORS['transparent'])
         self.update()
 
     def drawMatplotlib(self, qp:QtGui.QPainter, canvas:FigureCanvas, p1:QtCore.QPoint):
         size = canvas.size()
         width, height = size.width(), size.height()
-        im = QtGui.QImage(canvas.buffer_rgba(), width, height, QtGui.QImage.Format_ARGB32).rgbSwapped()
+        im = QtGui.QImage(canvas.buffer_rgba(), width, height, IMAGE_FORMATS['ARGB32']).rgbSwapped()
         p2 = QtCore.QPoint(int(p1.x()+width), int(p1.y()+height))
         qp.drawImage(QtCore.QRect(
             p1, 
@@ -251,28 +556,28 @@ class ScreenPenWindow(QMainWindow):
             self._setupTools()
         return _setColor
 
-    def _getEraserPen(self, color=Qt.transparent, size=30):
+    def _getEraserPen(self, color=COLORS['transparent'], size=30):
         pen = QtGui.QPen()
         pen.setBrush(QtGui.QBrush(color))
-        pen.setStyle(Qt.SolidLine) ; pen.setCapStyle(Qt.RoundCap) 
-        pen.setJoinStyle(Qt.RoundJoin) ; pen.setWidth(size)
+        pen.setStyle(PEN_STYLES['solidLine']) ; pen.setCapStyle(PEN_STYLES['roundCap']) 
+        pen.setJoinStyle(PEN_STYLES['roundJoin']) ; pen.setWidth(size)
         return pen
 
     def setEraser(self):
         def _setEraser():
             pix = QPixmap()
-            img = QtGui.QImage(QSize(32, 32), QtGui.QImage.Format_ARGB32)
-            img.fill(Qt.transparent)
+            img = QtGui.QImage(QSize(32, 32), IMAGE_FORMATS['ARGB32'])
+            img.fill(COLORS['transparent'])
             qp = QtGui.QPainter(img)
             qp.setPen(self._getEraserPen(QColor('#7acfe6'), 30))
             path = QtGui.QPainterPath()
-            path.moveTo(QPoint(16, 16))
-            path.cubicTo(QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
+            _path_move_to(path, QPoint(16, 16))
+            _path_cubic_to(path, QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
             qp.drawPath(path)
             qp.setPen(self._getEraserPen(QColor('#eccdec'), 26))
             path = QtGui.QPainterPath()
-            path.moveTo(QPoint(16, 16))
-            path.cubicTo(QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
+            _path_move_to(path, QPoint(16, 16))
+            _path_cubic_to(path, QPoint(16, 17), QPoint(16, 16), QPoint(16, 16))
             qp.drawPath(path)
             qp.end()
             pix = pix.fromImage(img)
@@ -297,7 +602,7 @@ class ScreenPenWindow(QMainWindow):
         def _setAction():
             self.curr_method = action
             if cursor is None:
-                self._setCursor(Qt.ArrowCursor)
+                self._setCursor(CURSORS['arrow_cursor'])
         return _setAction
 
     class ChartDialog(QDialog):
@@ -324,7 +629,9 @@ setattr(self, 'drawChart', drawChart)
             self.parent = parent
             self.setWindowTitle("Chart")
 
-            QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+
+
+            QBtn = DIALOG_BUTTONS['ok'] | DIALOG_BUTTONS['cancel']
 
             self.buttonBox = QDialogButtonBox(QBtn)
             self.buttonBox.accepted.connect(self.ok_success)
@@ -361,9 +668,9 @@ setattr(self, 'drawChart', drawChart)
 
     def showChart(self):
         def _showChart():
-            self._setCursor(Qt.ArrowCursor)
+            self._setCursor(CURSORS['arrow_cursor'])
             dlg = self.ChartDialog(self)
-            if dlg.exec_():
+            if _execute_dialog(dlg):
                 self.curr_method = 'drawChart'
             else:
                 pass
@@ -391,6 +698,7 @@ setattr(self, 'drawChart', drawChart)
     def saveDrawing(self):
         def _saveDrawing(n=0):
             filename = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+            print(f'Saving {filename}')
             self.captureScreen().save(f'{filename}')
         return _saveDrawing
 
@@ -418,19 +726,19 @@ setattr(self, 'drawChart', drawChart)
         self.toolBars = [penToolBar, boardToolBar, actionBar]
         self.addToolBar(penToolBar)
         self.addToolBar(boardToolBar)
-        self.addToolBar(Qt.LeftToolBarArea, actionBar)
+        self.addToolBar(TOOLBAR_AREAS['leftToolBarArea'], actionBar)
         
         avail_colors = {
-            'red': Qt.red,
-            'green': Qt.green,
-            'blue': Qt.blue,
-            'cyan': Qt.cyan,
-            'magenta': Qt.magenta,
-            'yellow': Qt.yellow,
-            'black': Qt.black,
-            'white': Qt.white,
-            'orange': QColor('#ff8000'),
-            'gray': QColor('#808080'),
+            'red': COLORS['red'],
+            'green': COLORS['green'],
+            'blue': COLORS['blue'],
+            'cyan': COLORS['cyan'],
+            'magenta': COLORS['magenta'],
+            'yellow': COLORS['yellow'],
+            'black': COLORS['black'],
+            'white': COLORS['white'],
+            'orange': _get_color_from_RGB(255, 165, 0),
+            'gray': _get_color_from_RGB(128, 128, 128),
         }
 
         for acol in avail_colors:
@@ -450,12 +758,12 @@ setattr(self, 'drawChart', drawChart)
         
 
         lineTypeMenu = QMenu()
-        lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), self.setStyle(Qt.SolidLine)))
-        lineTypeMenu.addAction(self.addAction('Dashed', self._getIcon('line_dashed'), self.setStyle(Qt.DashLine)))
+        lineTypeMenu.addAction(self.addAction('Solid', self._getIcon('line'), self.setStyle(PEN_STYLES['solidLine'])))
+        lineTypeMenu.addAction(self.addAction('Dashed', self._getIcon('line_dashed'), self.setStyle(PEN_STYLES['dashLine'])))
         lineTypeButton = QToolButton(self)
-        lineTypeButton.setToolButtonStyle(Qt.ToolButtonIconOnly)
+        lineTypeButton.setToolButtonStyle(TOOL_BUTTON_STYLE['toolButtonIconOnly'])
         lineTypeButton.setIcon(self._getIcon('line_type'))
-        lineTypeButton.setPopupMode(QToolButton.InstantPopup) # MenuButtonPopup
+        lineTypeButton.setPopupMode(POPUP_MODE['instantPopup']) # MenuButtonPopup
         lineTypeButton.setMenu(lineTypeMenu)
         lineTypeButton.setToolTip('Line type')
         actionBar.addWidget(lineTypeButton)
@@ -465,14 +773,14 @@ setattr(self, 'drawChart', drawChart)
         lineWidthMenu.addAction(self.addAction('Medium', self._getIcon('line_medium'), self.setWidth(width=15)))
         lineWidthMenu.addAction(self.addAction('Thick', self._getIcon('line_thick'), self.setWidth(width=25)))
         lineWidthButton = QToolButton(self)
-        lineWidthButton.setToolButtonStyle(Qt.ToolButtonIconOnly)
+        lineWidthButton.setToolButtonStyle(TOOL_BUTTON_STYLE['toolButtonIconOnly'])
         lineWidthButton.setIcon(self._getIcon('line_width'))
-        lineWidthButton.setPopupMode(QToolButton.InstantPopup)
+        lineWidthButton.setPopupMode(POPUP_MODE['instantPopup'])
         lineWidthButton.setMenu(lineWidthMenu)
         lineWidthButton.setToolTip('Line width')
         actionBar.addWidget(lineWidthButton)
-        boardToolBar.addAction(self.addAction("Whiteboard", self._getIcon('board', custom_colors_dict={'FILL': 'white'}), self.setupBoard(Qt.white)))
-        boardToolBar.addAction(self.addAction("Blackboard", self._getIcon('board', custom_colors_dict={'FILL': 'black'}), self.setupBoard(Qt.black)))
+        boardToolBar.addAction(self.addAction("Whiteboard", self._getIcon('board', custom_colors_dict={'FILL': 'white'}), self.setupBoard(COLORS['white'])))
+        boardToolBar.addAction(self.addAction("Blackboard", self._getIcon('board', custom_colors_dict={'FILL': 'black'}), self.setupBoard(COLORS['black'])))
         boardToolBar.addAction(self.addAction("Transparent", self._getIcon('board_transparent', custom_colors_dict={'FILL': 'black'}), self._clearBackground))
         boardToolBar.addAction(self.addAction("Remove drawings", self._getIcon('remove'), self.removeDrawing()))
         
@@ -492,14 +800,16 @@ setattr(self, 'drawChart', drawChart)
         qp = QtGui.QPainter(self.imageDraw)
         canvasPainter = QtGui.QPainter(self)
 
-        qp.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
-        canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
 
-        if Qt.LeftButton and self.drawing:
+
+        qp.setCompositionMode(COMPOSITION_MODE['source'])
+        canvasPainter.setCompositionMode(COMPOSITION_MODE['source_over'])
+
+        if BUTTONS['left'] and self.drawing:
             qp.setPen(self.curr_pen)
             qp.setBrush(self.curr_br)
             if self.curr_method in ['drawRect']:
-                qp.setBrush(Qt.NoBrush)
+                qp.setBrush(BRUSHES['no_brush'])
                 self.curr_args = [QtCore.QRect(self.begin, self.end)]
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
                 
@@ -512,7 +822,7 @@ setattr(self, 'drawChart', drawChart)
                 getattr(qp, 'drawEllipse')(*self.curr_args)
 
             elif self.curr_method in ['drawLine']:
-                qp.setBrush(Qt.NoBrush)
+                qp.setBrush(BRUSHES['no_brush'])
                 self.curr_args = [self.begin, self.end]
                 qp.drawImage(self.imageDraw.rect(), self.imageDraw_bck, self.imageDraw_bck.rect())
                 
@@ -537,9 +847,9 @@ setattr(self, 'drawChart', drawChart)
 
             elif self.curr_method in ['drawPath']:
                 if self.lastPoint != self.end:
-                    qp.setBrush(Qt.NoBrush)
+                    qp.setBrush(BRUSHES['no_brush'])
                     qp.setPen(self.curr_pen)
-                    self.path.cubicTo(self.end, self.end, self.end)
+                    _path_cubic_to(self.path, self.end, self.end, self.end)
                     self.curr_args = [self.path]
                     getattr(qp, self.curr_method)(*self.curr_args)
                     self.lastPoint = self.end
@@ -548,29 +858,29 @@ setattr(self, 'drawChart', drawChart)
 
             elif self.curr_method in ['drawEraser']:
                 if self.lastPoint != self.end:
-                    qp.setBrush(Qt.NoBrush)
-                    qp.setPen(self._getEraserPen(Qt.transparent))
-                    self.path.cubicTo(self.end, self.end, self.end)
+                    qp.setBrush(BRUSHES['no_brush'])
+                    qp.setPen(self._getEraserPen(COLORS['transparent']))
+                    _path_cubic_to(self.path, self.end, self.end, self.end)
                     self.curr_args = [self.path]
                     getattr(qp, 'drawPath')(*self.curr_args)
                     self.lastPoint = self.end
                     self.update()
                     qp.setBrush(self.curr_br)
 
-        qp.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
+        qp.setCompositionMode(COMPOSITION_MODE['source_over'])
         qp.end()
         
         canvasPainter.drawImage(self.rect(), self.background, self.background.rect())
         canvasPainter.drawImage(self.rect(), self.imageDraw, self.imageDraw.rect())
-        canvasPainter.setCompositionMode (QtGui.QPainter.CompositionMode_SourceOver)
+        canvasPainter.setCompositionMode(COMPOSITION_MODE['source_over'])
         canvasPainter.end()
 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
+        if event.button() == BUTTONS['right']:
             sys.exit(0)
             
-        if event.button() == Qt.LeftButton and self.childAt(event.pos()) is None:
+        if event.button() == BUTTONS['left'] and self.childAt(event.pos()) is None:
             self.drawing = True
 
         if self.curr_method in ['drawRect', 'drawChart', 'drawLine', 'drawDot']:
@@ -584,7 +894,7 @@ setattr(self, 'drawChart', drawChart)
             self.path = QtGui.QPainterPath()
             self.begin = self.scaleCoords(event.pos())
             self.end = self.scaleCoords(event.pos())
-            self.path.moveTo(self.begin)
+            _path_move_to(self.path, self.begin)
             self.lastPoint = self.scaleCoords(event.pos())
         self.update()
 
@@ -624,12 +934,12 @@ setattr(self, 'drawChart', drawChart)
             
     def drawPixmap(self, p):
         qp = QtGui.QPainter(self.imageDraw)
-        qp.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
+        qp.setCompositionMode (COMPOSITION_MODE['source'])
         qp.drawPixmap(self.imageDraw.rect(), p, p.rect())
         qp.end()
 
         qp2 = QtGui.QPainter(self.imageDraw_bck)
-        qp2.setCompositionMode (QtGui.QPainter.CompositionMode_Source)
+        qp2.setCompositionMode (COMPOSITION_MODE['source'])
         qp2.drawPixmap(self.imageDraw_bck.rect(), p, p.rect())
         qp2.end()
 
@@ -644,7 +954,7 @@ setattr(self, 'drawChart', drawChart)
         self.update()
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton and self.drawing == True:
+        if event.button() == BUTTONS['left'] and self.drawing == True:
             self.drawing = False
             self.path = None
 
@@ -665,12 +975,15 @@ setattr(self, 'drawChart', drawChart)
 
 
 def _grab_screen(screen_idx, screen):
-    screen_geom = QDesktopWidget().screenGeometry(screen_idx)
+    if pyqt_version == 5:
+        screen_geom = QDesktopWidget().screenGeometry(screen_idx)
+    else:
+        screen_geom = QGuiApplication.screens()[screen_idx].geometry()
+
     return (
         screen_geom, 
-        QScreen.grabWindow(
-            screen, 
-            QApplication.desktop().winId(), 
+        screen.grabWindow(
+            0, 
             screen_geom.x(), 
             screen_geom.y(), 
             screen.size().width(), 
@@ -710,20 +1023,20 @@ def show_screen_selection(screens):
 
         shad = QtWidgets.QGraphicsDropShadowEffect()
         shad.setOffset(-10, 10)
-        shad.setColor(Qt.black)
+        shad.setColor(COLORS['black'])
 
         lay = QVBoxLayout(btn)
         lbl = QtWidgets.QLabel()
         lbl.setContentsMargins(0, 0, 0, 0)
-        lbl.setStyleSheet("""color : white; font-weight:6000;""")
+        lbl.setStyleSheet("""color : white; font-weight:1000;""")
         lbl.setText(label)
         lbl.setGraphicsEffect(shad)
-        lay.addWidget(lbl, alignment=QtCore.Qt.AlignCenter)
+        lay.addWidget(lbl, alignment=ALIGNMENT['center'])
         return btn
 
     dlg = QDialog()
     dlg.layout = QGridLayout()
-    dlg.layout.addWidget(QLabel('Select the screen') , 0, 0, 1, number_of_screens, alignment=QtCore.Qt.AlignCenter)
+    dlg.layout.addWidget(QLabel('Select the screen') , 0, 0, 1, number_of_screens, alignment=ALIGNMENT['center'])
 
     def _getBtnAction(idx):
         def act():
@@ -737,24 +1050,24 @@ def show_screen_selection(screens):
         btn.released.connect(_getBtnAction(idx+1))
         dlg.layout.addWidget(btn , 1, idx)
     dlg.setLayout(dlg.layout)
-    return dlg.exec_()
+    return _execute_dialog(dlg)
 
 def _setPalette(app):
-    palette = QPalette()
-    palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    palette.setColor(QPalette.WindowText, Qt.white)
-    palette.setColor(QPalette.Base, QColor(25, 25, 25))
-    palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-    palette.setColor(QPalette.ToolTipBase, Qt.black)
-    palette.setColor(QPalette.ToolTipText, Qt.white)
+    palette = _create_palette()
+    _set_palette_color(palette, PALETTE_PROPS['window'], _get_color_from_RGB(53, 53, 53))
+    _set_palette_color(palette, PALETTE_PROPS['windowText'], COLORS['white'])
+    _set_palette_color(palette, PALETTE_PROPS['base'], _get_color_from_RGB(25, 25, 25))
+    _set_palette_color(palette, PALETTE_PROPS['alternateBase'], _get_color_from_RGB(53, 53, 53))
+    _set_palette_color(palette, PALETTE_PROPS['toolTipBase'], COLORS['black'])
+    _set_palette_color(palette, PALETTE_PROPS['toolTipText'], COLORS['white'])
+    _set_palette_color(palette, PALETTE_PROPS['text'], COLORS['white'])
+    _set_palette_color(palette, PALETTE_PROPS['button'], _get_color_from_RGB(53, 53, 53))
+    _set_palette_color(palette, PALETTE_PROPS['buttonText'], COLORS['white'])
+    _set_palette_color(palette, PALETTE_PROPS['brightText'], COLORS['red'])
+    _set_palette_color(palette, PALETTE_PROPS['link'], _get_color_from_RGB(42, 130, 218))
+    _set_palette_color(palette, PALETTE_PROPS['highlight'], _get_color_from_RGB(42, 130, 218))
+    _set_palette_color(palette, PALETTE_PROPS['highlightedText'], COLORS['black'])
     
-    palette.setColor(QPalette.Text, Qt.white)
-    palette.setColor(QPalette.Button, QColor(53, 53, 53))
-    palette.setColor(QPalette.ButtonText, Qt.white)
-    palette.setColor(QPalette.BrightText, Qt.red)
-    palette.setColor(QPalette.Link, QColor(42, 130, 218))
-    palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-    palette.setColor(QPalette.HighlightedText, Qt.black)
     app.setPalette(palette)
     app.setStyle("Fusion")
 
@@ -795,7 +1108,7 @@ def main():
     use_transparency = args.transparent or _is_transparency_supported()
     
     window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
-    sys.exit(app.exec_())
+    sys.exit(_execute_dialog(app))
 
 if __name__ == '__main__':
     main()

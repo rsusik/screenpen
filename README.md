@@ -36,7 +36,6 @@ The behavior of the program depends on the Window System you use:
 * sometimes your WM may be detected as not supporting "live transparency". In that case try running with `-t` parameter to force it._
 
 
-
 ### Demo (video)
 
 https://user-images.githubusercontent.com/19404835/130215780-705e4eb9-330b-4a91-bd1f-b9ec3843556e.mp4
@@ -73,3 +72,13 @@ screenpen -t
 ### TODO
 
 - [ ] Better Matplotlib charts support.
+
+### Compatilibity notes
+
+Screenpen (from 0.2 version) is compatible with PyQt5 and PyQt6, nevertheless the PyQt5 is currently in the requirements and recommended.
+It is possible to run it using PyQt6 by running:
+```
+pip install screenpen --no-deps
+pip install matplotlib>=3.2 numpy>=1.8 PyQt6
+```
+
