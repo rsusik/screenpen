@@ -19,6 +19,9 @@
 </a>
 </p>
 
+## Wayland users!
+Wayland is not supported yet.
+
 ## Description
 
 Screen annotation software which allows drawing directly on the screen. 
