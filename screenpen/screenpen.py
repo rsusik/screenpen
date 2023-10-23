@@ -374,7 +374,7 @@ sys.modules['syntax'] = syntax
 spec.loader.exec_module(syntax)
 
 class ScreenPenWindow(QMainWindow):
-    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True): # app: QApplication
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True, icon_size = 50): # app: QApplication
         super().__init__()
 
         # PATHS
@@ -396,6 +396,7 @@ class ScreenPenWindow(QMainWindow):
         self.screen_pixmap = pixmap
         self.screen_geom = screen_geom
         self.transparent_background = transparent_background
+        self.icon_size = icon_size
 
         if self.transparent_background:
             self.setAttribute(WINDOW_ATTRS['translucentBackground'])
@@ -720,11 +721,11 @@ setattr(self, 'drawChart', drawChart)
 
     def _createToolBars(self):
         penToolBar = QToolBar("Color", self)
-        penToolBar.setIconSize(QSize(50, 50))
+        penToolBar.setIconSize(QSize(self.icon_size, self.icon_size))
         boardToolBar = QToolBar("Color", self)
-        boardToolBar.setIconSize(QSize(50, 50))
+        boardToolBar.setIconSize(QSize(self.icon_size, self.icon_size))
         actionBar = QToolBar("Action", self)
-        actionBar.setIconSize(QSize(50, 50))
+        actionBar.setIconSize(QSize(self.icon_size, self.icon_size))
         self.toolBars = [penToolBar, boardToolBar, actionBar]
         self.addToolBar(penToolBar)
         self.addToolBar(boardToolBar)
@@ -1086,6 +1087,8 @@ def main():
     parser.add_argument('-2', nargs='?', type=int, dest='screen', const='1')
     parser.add_argument('-3', nargs='?', type=int, dest='screen', const='2')
     parser.add_argument('-t', '--transparent', dest='transparent', help='Force transparent background. If you are sure your WM support it.', action='store_true')
+    parser.add_argument('-i', '--iconsize', type=int, dest='icon_size', help='Sets the icon size, default = 50', default=50)
+
     args = parser.parse_args()
     
     app = QApplication(sys.argv)
@@ -1112,7 +1115,8 @@ def main():
     
     use_transparency = args.transparent or _is_transparency_supported()
     
-    window = ScreenPenWindow(screen, screen_geom, pixmap, use_transparency)
+    window = ScreenPenWindow(screen=screen, screen_geom=screen_geom, pixmap=pixmap,
+                             transparent_background=use_transparency, icon_size=args.icon_size)
     sys.exit(_execute_dialog(app))
 
 if __name__ == '__main__':
