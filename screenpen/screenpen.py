@@ -431,6 +431,8 @@ class ScreenPenWindow(QMainWindow):
         self.sc_undo.activated.connect(self.undo)
         self.sc_redo = QShortcut(QKeySequence('Ctrl+Y'), self)
         self.sc_redo.activated.connect(self.redo)
+        self.sc_quit_program = QShortcut(QKeySequence('Escape'), self)
+        self.sc_quit_program.activated.connect(self.quit_program)
 
     def _setCursor(self, cursor, hotx = None, hoty = None):
         if hotx is None:
@@ -952,6 +954,9 @@ setattr(self, 'drawChart', drawChart)
         p = self.history.redo()
         self.drawPixmap(p)
         self.update()
+
+    def quit_program(self):
+        sys.exit(0)
 
     def mouseReleaseEvent(self, event):
         if event.button() == BUTTONS['left'] and self.drawing == True:
