@@ -375,7 +375,7 @@ sys.modules['syntax'] = syntax
 spec.loader.exec_module(syntax)
 
 class ScreenPenWindow(QMainWindow):
-    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True, icon_size = 50,
+    def __init__(self, screen, screen_geom, pixmap: QtGui.QPixmap = None, transparent_background = True,
                     config_file=None): # app: QApplication
         super().__init__()
 
