@@ -72,9 +72,25 @@ screenpen -t
     * `Ctrl+Y` - redo,
     * hold `Shift` - change mouse cursor icon to arrrow.
 
+
+### Configuration
+There are a few configuration options that can be set using config file:
+* `icon_size` - size of the icons (default: 50)
+* `hidden_menus` - to hide menus on start (default: False)
+
+The config should look like below:
+```ini
+[screenpen]
+hidden_menus = False
+icon_size = 50
+```
+(more options will be added in the future...)
+
 ### TODO
 
 - [ ] Better Matplotlib charts support.
+- [ ] Wayland support.
+- [ ] Extended configuration.
 
 ### Compatilibity notes
 
