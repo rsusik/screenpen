@@ -42,6 +42,7 @@ import subprocess
 import sys
 from datetime import datetime
 import configparser
+from itertools import groupby
 
 if pyqt_version == 5:
     from PyQt5 import QtGui
@@ -1021,6 +1022,42 @@ setattr(self, 'drawChart', drawChart)
             self.update()
         return _setupBoard
 
+class ScreenshotError(Exception):
+    pass
+
+def _get_screenshots_grim(screens):
+    pixmaps = []
+    for idx, screen in enumerate(screens):
+        # name = s.name()
+        screen_geom = QDesktopWidget().screenGeometry(idx)
+        x = screen_geom.x()
+        y = screen_geom.y()
+        w = screen_geom.width()
+        h = screen_geom.height()
+        
+        try:
+            subprocess.run(
+                f'grim -g "{x},{y} {w}x{h}" "./~screen{idx}.png"', 
+                check=True,
+                shell=True,
+                stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+            )
+            
+            pixmap = QPixmap(f'./~screen{idx}.png')
+            pixmaps.append((
+                screen,
+                screen_geom,
+                pixmap
+            ))
+        except subprocess.CalledProcessError as e:
+            raise ScreenshotError('Grim is not available')
+    for idx in range(len(screens)):
+        try:
+            os.remove(f'./~screen{idx}.png')
+        except FileNotFoundError:
+            pass
+    return pixmaps
+
 
 def _grab_screen(screen_idx, screen):
     if pyqt_version == 5:
@@ -1040,12 +1077,94 @@ def _grab_screen(screen_idx, screen):
     )
     
 
-def _get_screens(app):
-    screens = []
-    for screen_idx, screen in enumerate(app.screens()):
+def _get_screenshots_pyqt(screens):
+    screenshots = []
+    for screen_idx, screen in enumerate(screens):
         screen_geom, screen_pixmap = _grab_screen(screen_idx, screen)
-        screens.append([screen, screen_geom, screen_pixmap])
-    return screens
+        screenshots.append([screen, screen_geom, screen_pixmap])
+    return screenshots
+
+
+def _get_screenshots_pillow(screens):
+    from PIL import ImageGrab, Image, UnidentifiedImageError
+    from time import sleep
+    screenshots = []
+    for idx, screen in enumerate(screens):
+        screen_geom = QDesktopWidget().screenGeometry(idx)
+        try:
+            img = ImageGrab.grab(
+                bbox=(
+                    screen_geom.x(), screen_geom.y(), 
+                    screen_geom.x()+screen.size().width(), screen_geom.y()+screen.size().height()
+                ), 
+                xdisplay=""
+            )
+        except UnidentifiedImageError as e:
+            sleep(1)
+            try:
+                img = [el for el in e.args[0].split("'") if el.endswith('.png')][0]
+                img = Image.open(img)
+                img = img.crop((screen_geom.x(), screen_geom.y(), screen_geom.x()+screen.size().width(), screen_geom.y()+screen.size().height()))
+            except Exception as e:
+                raise ScreenshotError('Pillow problem')
+        except Exception as e:
+            raise ScreenshotError('Pillow problem')
+        img = img.convert('RGB')
+        data = img.tobytes('raw', 'RGB')
+        qim = QtGui.QImage(data, img.size[0], img.size[1], QtGui.QImage.Format_RGB888)
+        screen_pixmap = QtGui.QPixmap.fromImage(qim)
+        screenshots.append([screen, screen_geom, screen_pixmap])
+    return screenshots
+
+
+def _is_grim_installed():
+    try:
+        subprocess.run('grim -h2', shell=True, 
+            stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+            check=True)
+        return True
+    except:
+        return False
+    
+
+def _is_pillow_installed():
+    try:
+        import PIL
+        return True
+    except:
+        return False
+
+
+def _get_screens(app):
+    screens = app.screens()
+    if len(screens) < 1:
+        raise ScreenshotError('No screens found')
+    
+    try:
+        if _is_grim_installed():
+            return _get_screenshots_grim(app.screens())
+        else:
+            raise ScreenshotError('Grim problem')
+    except ScreenshotError as e:
+        pass
+
+    try:
+        if _is_pillow_installed():
+            return _get_screenshots_pillow(app.screens())
+        else:
+            raise ScreenshotError('Pillow problem')
+    except ScreenshotError as e:
+        pass
+
+    try:
+        screenshots = _get_screenshots_pyqt(app.screens())
+        imgs = [screenshot[-1].toImage() for screenshot in screenshots]
+        pxls = [img.pixel(i, j) for img in imgs for i in range(img.width()) for j in range(img.height())]
+        if [next(g, f := next(g, g)) == f for g in [groupby(pxls)]][0]:
+            print('Warning: All screens seems to be blank (e.g. black). It means your system configuration may not be supported.')
+        return screenshots
+    except:
+        print('Warning: Unable to take screenshots of your screens. Your system configuration may not be supported.')
 
 
 def _is_transparency_supported():
