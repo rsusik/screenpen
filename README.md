@@ -19,8 +19,6 @@
 </a>
 </p>
 
-## Wayland users!
-Wayland is not supported yet.
 
 ## Description
 
