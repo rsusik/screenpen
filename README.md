@@ -87,7 +87,7 @@ icon_size = 50
 ### TODO
 
 - [ ] Better Matplotlib charts support.
-- [ ] Wayland support.
+- [ ] Better wayland support.
 - [ ] Extended configuration.
 
 ### Compatilibity notes
@@ -99,3 +99,9 @@ pip install matplotlib>=3.2 numpy>=1.8 PyQt6
 pip install screenpen --no-deps
 ```
 
+### Wayland support
+
+Screenpen works in some Wayland compositors, but it is not perfect.
+There are issues with windows positioning and transparency.
+In case the window opens on wrong monitor (which I noticed on Sway WM) you can move it using `Win+Shift+Arrows` (or `Alt+Shift+Arrows`) shortcuts to a desired monitor.
+I have no plans to fix it in near future, but I will accept PRs.
