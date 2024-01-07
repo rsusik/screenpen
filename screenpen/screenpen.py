@@ -400,6 +400,9 @@ class ScreenPenWindow(QMainWindow):
 
         hidden_menus = config['screenpen'].getboolean('hidden_menus')
         icon_size = config['screenpen'].getint('icon_size')
+        penbar_area = config['screenpen'].get('penbar_area')
+        boardbar_area = config['screenpen'].get('boardbar_area')
+        actionbar_area = config['screenpen'].get('actionbar_area')
 
         self.files = SimpleNamespace(
             resources_xml = resources_xml_path
@@ -440,7 +443,7 @@ class ScreenPenWindow(QMainWindow):
         self._setupTools()
         self._setupIcons()
         self._setupCodes()
-        self._createToolBars()
+        self._createToolBars(penbar_area, boardbar_area, actionbar_area)
         if self.hidden_menus:
             self.hide_menus()
 
@@ -737,17 +740,20 @@ setattr(self, 'drawChart', drawChart)
         return action
 
 
-    def _createToolBars(self):
+    def _createToolBars(self, penbar_area=None, boardbar_area=None, actionbar_area=None):
         penToolBar = QToolBar("Color", self)
         penToolBar.setIconSize(QSize(self.icon_size, self.icon_size))
+        penToolBarArea = TOOLBAR_AREAS.get(penbar_area, TOOLBAR_AREAS['topToolBarArea'])
         boardToolBar = QToolBar("Color", self)
         boardToolBar.setIconSize(QSize(self.icon_size, self.icon_size))
+        boardToolBarArea = TOOLBAR_AREAS.get(boardbar_area, TOOLBAR_AREAS['topToolBarArea'])
         actionBar = QToolBar("Action", self)
         actionBar.setIconSize(QSize(self.icon_size, self.icon_size))
+        actionBarArea = TOOLBAR_AREAS.get(actionbar_area, TOOLBAR_AREAS['leftToolBarArea'])
         self.toolBars = [penToolBar, boardToolBar, actionBar]
-        self.addToolBar(penToolBar)
-        self.addToolBar(boardToolBar)
-        self.addToolBar(TOOLBAR_AREAS['leftToolBarArea'], actionBar)
+        self.addToolBar(penToolBarArea, penToolBar)
+        self.addToolBar(boardToolBarArea, boardToolBar)
+        self.addToolBar(actionBarArea, actionBar)
         
         avail_colors = {
             'red': COLORS['red'],
