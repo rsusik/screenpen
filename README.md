@@ -79,6 +79,10 @@ There are a few configuration options that can be set using config file:
 The config should look like below:
 ```ini
 [screenpen]
+; Possible values for areas: topToolBarArea, bottomToolBarArea, leftToolBarArea, rightToolBarArea
+penbar_area = topToolBarArea
+boardbar_area = topToolBarArea
+actionbar_area = leftToolBarArea
 hidden_menus = False
 icon_size = 50
 ```
