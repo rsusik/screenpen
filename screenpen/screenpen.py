@@ -398,8 +398,11 @@ class ScreenPenWindow(QMainWindow):
         if config_file is not None:
             config.read(config_file)
 
-        hidden_menus = config['screenpen'].getboolean('hidden_menus')
-        icon_size = config['screenpen'].getint('icon_size')
+        hidden_menus   = config['screenpen'].getboolean('hidden_menus')
+        icon_size      = config['screenpen'].getint('icon_size')
+        penbar_area    = TOOLBAR_AREAS[config['screenpen'].get('penbar_area')]
+        boardbar_area  = TOOLBAR_AREAS[config['screenpen'].get('boardbar_area')]
+        actionbar_area = TOOLBAR_AREAS[config['screenpen'].get('actionbar_area')]
 
         self.files = SimpleNamespace(
             resources_xml = resources_xml_path
@@ -411,6 +414,9 @@ class ScreenPenWindow(QMainWindow):
         self.transparent_background = transparent_background
         self.hidden_menus = hidden_menus
         self.icon_size = icon_size
+        self.penbar_area = penbar_area
+        self.boardbar_area = boardbar_area
+        self.actionbar_area = actionbar_area
 
         if self.transparent_background:
             self.setAttribute(WINDOW_ATTRS['translucentBackground'])
@@ -745,9 +751,9 @@ setattr(self, 'drawChart', drawChart)
         actionBar = QToolBar("Action", self)
         actionBar.setIconSize(QSize(self.icon_size, self.icon_size))
         self.toolBars = [penToolBar, boardToolBar, actionBar]
-        self.addToolBar(penToolBar)
-        self.addToolBar(boardToolBar)
-        self.addToolBar(TOOLBAR_AREAS['leftToolBarArea'], actionBar)
+        self.addToolBar(self.penbar_area, penToolBar)
+        self.addToolBar(self.boardbar_area, boardToolBar)
+        self.addToolBar(self.actionbar_area, actionBar)
         
         avail_colors = {
             'red': COLORS['red'],
