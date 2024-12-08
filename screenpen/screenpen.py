@@ -404,6 +404,15 @@ class ScreenPenWindow(QMainWindow):
         boardbar_area  = TOOLBAR_AREAS[config['screenpen'].get('boardbar_area')]
         actionbar_area = TOOLBAR_AREAS[config['screenpen'].get('actionbar_area')]
 
+        exit_mouse_button = config['screenpen'].get('exit_mouse_button', '')
+        exit_shortcut = config['screenpen'].get('exit_shortcut', '')
+
+        if exit_mouse_button:
+            self.exit_button = BUTTONS[exit_mouse_button]
+        if exit_shortcut:
+            self.sc_exit_program = QShortcut(QKeySequence(exit_shortcut), self)
+            self.sc_exit_program.activated.connect(self.quit_program)
+
         self.files = SimpleNamespace(
             resources_xml = resources_xml_path
         )
@@ -450,14 +459,12 @@ class ScreenPenWindow(QMainWindow):
         if self.hidden_menus:
             self.hide_menus()
 
-        self.sc_undo = QShortcut(QKeySequence('Ctrl+Z'), self)
+        self.sc_undo = QShortcut(QKeySequence(config['screenpen'].get('sc_undo', 'Ctrl+Z')), self)
         self.sc_undo.activated.connect(self.undo)
-        self.sc_redo = QShortcut(QKeySequence('Ctrl+Y'), self)
+        self.sc_redo = QShortcut(QKeySequence(config['screenpen'].get('sc_redo', 'Ctrl+Y')), self)
         self.sc_redo.activated.connect(self.redo)
-        self.sc_toggle_menus = QShortcut(QKeySequence('Ctrl+1'), self)
+        self.sc_toggle_menus = QShortcut(QKeySequence(config['screenpen'].get('sc_toggle_menus', 'Ctrl+1')), self)
         self.sc_toggle_menus.activated.connect(self.toggle_menus)
-        self.sc_quit_program = QShortcut(QKeySequence('Escape'), self)
-        self.sc_quit_program.activated.connect(self.quit_program)
 
     def _setCursor(self, cursor, hotx = None, hoty = None):
         if hotx is None:
@@ -911,7 +918,7 @@ setattr(self, 'drawChart', drawChart)
 
 
     def mousePressEvent(self, event):
-        if event.button() == BUTTONS['right']:
+        if hasattr(self, 'exit_button') and event.button() == self.exit_button:
             sys.exit(0)
 
         if event.button() == BUTTONS['middle']:
