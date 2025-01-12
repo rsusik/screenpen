@@ -398,11 +398,12 @@ class ScreenPenWindow(QMainWindow):
         if config_file is not None:
             config.read(config_file)
 
-        hidden_menus   = config['screenpen'].getboolean('hidden_menus')
-        icon_size      = config['screenpen'].getint('icon_size')
-        penbar_area    = TOOLBAR_AREAS[config['screenpen'].get('penbar_area')]
-        boardbar_area  = TOOLBAR_AREAS[config['screenpen'].get('boardbar_area')]
-        actionbar_area = TOOLBAR_AREAS[config['screenpen'].get('actionbar_area')]
+        hidden_menus    = config['screenpen'].getboolean('hidden_menus')
+        icon_size       = config['screenpen'].getint('icon_size')
+        penbar_area     = TOOLBAR_AREAS[config['screenpen'].get('penbar_area')]
+        boardbar_area   = TOOLBAR_AREAS[config['screenpen'].get('boardbar_area')]
+        actionbar_area  = TOOLBAR_AREAS[config['screenpen'].get('actionbar_area')]
+        drawing_history = config['screenpen'].getint('drawing_history')
 
         exit_mouse_button = config['screenpen'].get('exit_mouse_button', '')
         exit_shortcut = config['screenpen'].get('exit_shortcut', '')
@@ -436,7 +437,7 @@ class ScreenPenWindow(QMainWindow):
         self._createCanvas()
         self._clearCanvas()
         
-        self.history = self.drawingHistory(30)
+        self.history = self.drawingHistory(drawing_history)
         self.history.append(self.screen_pixmap)
 
         self.begin = QtCore.QPoint()

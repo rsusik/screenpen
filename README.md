@@ -85,6 +85,12 @@ boardbar_area = topToolBarArea
 actionbar_area = leftToolBarArea
 hidden_menus = False
 icon_size = 50
+sc_undo = Ctrl+Z
+sc_redo = Ctrl+Y
+sc_toggle_menus = Ctrl+1
+exit_mouse_button = right
+exit_shortcut = Escape
+drawing_history = 500
 ```
 (more options will be added in the future...)
 
@@ -92,7 +98,9 @@ icon_size = 50
 
 - [ ] Better Matplotlib charts support.
 - [ ] Better wayland support.
-- [ ] Extended configuration.
+- [ ] Add "paste image" feature.
+- [ ] Add ellipse shape.
+- [ ] Keyboard shortcuts for changing colors.
 
 ### Compatilibity notes
 
