@@ -470,9 +470,9 @@ class ScreenPenWindow(QMainWindow):
     def _setCursor(self, cursor, hotx = None, hoty = None):
         if hotx is None:
             hotx = 2
-        if hoty is None:
+        elif hoty is None:
             hoty = 2
-        if type(cursor) == str:
+        elif type(cursor) == str:
             pixm = QtGui.QPixmap.fromImage(QtGui.QImage.fromData(bytes(self._applySvgConfig(self._icons[cursor], None), encoding='utf-8')))
             pixm = pixm.scaled(QSize(32, 32))
             self.setCursor(QCursor(pixm, int(hotx), int(hoty)))
@@ -485,14 +485,14 @@ class ScreenPenWindow(QMainWindow):
         if event.isAutoRepeat():
             return
         k = event.key()
-        if (k==KEYS['shift']):
+        elif (k==KEYS['shift']):
             self._setCursor('arrow2')
 
     def keyReleaseEvent(self, event):
-        if event.isAutoRepeat():
+        elif event.isAutoRepeat():
             return
         k = event.key()
-        if (k==KEYS['shift']):
+        elif (k==KEYS['shift']):
             self._setCursor(Qt.ArrowCursor)
 
     def _setupIcons(self):
