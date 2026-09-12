@@ -49,8 +49,10 @@ if pyqt_version == 5:
     from PyQt5 import QtWidgets
     from PyQt5 import QtCore
     from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget
-    from PyQt5.QtCore import QPoint, Qt, QSize
+    from PyQt5.QtCore import QPoint, Qt, QSize, QDir
     from PyQt5.QtWidgets import QToolBar, QAction, QDialog, QToolButton, QMenu, QColorDialog
+    # 文件选择
+    from PyQt5.QtWidgets import QFileDialog
     from PyQt5.QtGui import (
         QIcon, QScreen, QPalette, QColor, QCursor,
         QSyntaxHighlighter, QPixmap, QKeySequence
@@ -198,7 +200,7 @@ elif pyqt_version == 6:
     from PyQt6 import QtWidgets
     from PyQt6 import QtCore
     from PyQt6.QtWidgets import QMainWindow, QApplication #, QDesktopWidget
-    from PyQt6.QtCore import QPoint, Qt, QSize
+    from PyQt6.QtCore import QPoint, Qt, QSize, QDir
     from PyQt6.QtWidgets import QToolBar, QDialog, QToolButton, QMenu, QColorDialog
     from PyQt6.QtGui import (
         QGuiApplication,
@@ -729,12 +731,14 @@ setattr(self, 'drawChart', drawChart)
         for tb in self.toolBars:
             tb.show()
         return img
-
+    def saveLocation(self):
+        fname = QFileDialog.getExistingDirectory(self, '选择保存目录', QDir.homePath())
+        return fname
     def saveDrawing(self):
         def _saveDrawing(n=0):
             filename = f'{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
-            print(f'Saving {filename}')
-            self.captureScreen().save(f'{filename}')
+            location = self.saveLocation()+"/"
+            self.captureScreen().save(f'{location}{filename}')
         return _saveDrawing
 
     def colorPicker(self):
