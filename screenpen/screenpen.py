@@ -7,7 +7,7 @@
 
 #from .version import __version__  # noqa: F401,E402
 
-import pkg_resources
+import importlib.metadata
 
 try:
     import PyQt5
@@ -29,13 +29,13 @@ except ImportError:
 
 
 try:
-    pkg_resources.get_distribution("PySide6")
+    importlib.metadata.distribution("PySide6")
     print('\033[41m', end='')
     print('=========================> WARNING <===========================')
     print('>       PySide6 is installed but PyQt5 only is expected.      <')
     print('>          Errors may appear. Please remove PySide6.          <')
     print('===============================================================\033[0m')
-except pkg_resources.DistributionNotFound:
+except importlib.metadata.PackageNotFoundError:
     pass
 
 import subprocess
